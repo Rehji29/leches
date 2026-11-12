@@ -1,12 +1,714 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="style.css">
-    <title>Mid-Tech AAC</title>
-</head>
-<body>
-    
-</body>
-</html>
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Mid-tech AAC</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&display=swap">
+<style>
+:root {
+  --bg: #f4f7fc;
+  --surface: #ffffff;
+  --bar-bg: #212e4d;
+  --bar-ink: #ffffff;
+  --accent: #4da6f0;
+  --ink: #1d2a48;
+  --ink-soft: #6b7690;
+  --line: #d3ddef;
+  --focus: #2f7de0;
+  --chip: #324164;
+  --tile-l: .93; --tile-c: .055;
+  --tile-bl: .85; --tile-bc: .075;
+  --swatch-l: .84; --swatch-c: .1;
+  --danger: #c2362f;
+  --scrim: rgba(18, 27, 48, .55);
+  --font: "Nunito", ui-rounded, "Segoe UI", system-ui, sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0e1526; --surface: #17203a; --bar-bg: #18233f; --bar-ink: #fff; --accent: #5db1f5;
+    --ink: #eaf0ff; --ink-soft: #9ca8c6; --line: #2b3857; --focus: #7db6ff; --chip: #2a3860;
+    --tile-l: .31; --tile-c: .06; --tile-bl: .43; --tile-bc: .09;
+    --swatch-l: .5; --swatch-c: .12; --danger: #ff8a82; --scrim: rgba(3, 7, 16, .7);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0e1526; --surface: #17203a; --bar-bg: #18233f; --bar-ink: #fff; --accent: #5db1f5;
+  --ink: #eaf0ff; --ink-soft: #9ca8c6; --line: #2b3857; --focus: #7db6ff; --chip: #2a3860;
+  --tile-l: .31; --tile-c: .06; --tile-bl: .43; --tile-bc: .09;
+  --swatch-l: .5; --swatch-c: .12; --danger: #ff8a82; --scrim: rgba(3, 7, 16, .7);
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+html, body { height: 100%; }
+body {
+  background: var(--bg); color: var(--ink);
+  font-family: var(--font); font-size: 16px; line-height: 1.3;
+  margin: 0; display: flex; flex-direction: column; overflow: hidden;
+  -webkit-tap-highlight-color: transparent; user-select: none; -webkit-user-select: none;
+}
+body::before {
+  content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px);
+  background: var(--bar-bg); z-index: 10;
+}
+button { font: inherit; color: inherit; cursor: pointer; }
+:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+
+.hdr {
+  flex: none; background: var(--bar-bg); color: var(--bar-ink);
+  padding-block: 10px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  display: flex; align-items: center; gap: 12px; min-height: 64px;
+}
+.logo { width: 54px; height: 36px; flex: none; }
+.title { font-weight: 800; font-size: clamp(20px, 3.4vw, 30px); letter-spacing: -.01em; margin: 0; white-space: nowrap; }
+.title b { color: var(--accent); font-weight: 800; }
+.chip {
+  background: var(--chip); color: var(--bar-ink); border-radius: 999px; padding: 4px 12px;
+  font-weight: 700; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0;
+}
+.sp { flex: 1; }
+.hbtn {
+  width: 46px; height: 46px; border-radius: 50%; border: 0; background: var(--chip); color: var(--bar-ink);
+  display: grid; place-items: center; flex: none;
+}
+.hbtn:active { transform: scale(.94); }
+.hbtn svg { width: 24px; height: 24px; }
+.hdr :focus-visible { outline-color: #fff; }
+
+.editbar {
+  flex: none; display: flex; align-items: center; gap: 12px; background: var(--accent); color: #0d1b33;
+  padding-block: 8px; font-weight: 800;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.editbar span { flex: 1; min-width: 0; }
+.editbar button { border: 0; background: #0d1b33; color: #fff; border-radius: 999px; padding: 8px 18px; font-weight: 800; }
+
+.main {
+  flex: 1; min-height: 0; display: flex; flex-direction: column; gap: 12px; padding-block: 12px;
+  padding-left: max(14px, env(safe-area-inset-left, 0px));
+  padding-right: max(14px, env(safe-area-inset-right, 0px));
+}
+.sentence {
+  flex: none; display: flex; align-items: center; gap: 6px; background: var(--surface);
+  border: 2px solid var(--line); border-radius: 22px; min-height: 64px; padding: 6px 8px 6px 6px;
+}
+.say-btn {
+  width: 50px; height: 50px; border-radius: 16px; border: 0; background: transparent; color: var(--ink);
+  display: grid; place-items: center; flex: none;
+}
+.say-btn svg { width: 34px; height: 34px; }
+.say-btn:active { transform: scale(.94); }
+.waves path { transition: opacity .2s; }
+.sentence.speaking .waves path { animation: wave 1s infinite ease-in-out; }
+.sentence.speaking .waves path:nth-child(2) { animation-delay: .25s; }
+@keyframes wave { 0%, 100% { opacity: .25; } 50% { opacity: 1; } }
+.stext {
+  flex: 1; min-width: 0; font-size: clamp(22px, 4vw, 36px); font-weight: 800; white-space: nowrap;
+  overflow-x: auto; scrollbar-width: none; padding: 8px 6px; align-self: stretch; display: flex; align-items: center;
+  cursor: pointer; border: 0; background: none; text-align: left;
+}
+.stext::-webkit-scrollbar { display: none; }
+.stext span { display: block; }
+.stext.empty span { color: var(--ink-soft); font-style: italic; font-weight: 600; }
+.sbtn {
+  width: 46px; height: 46px; border-radius: 14px; border: 0; background: var(--bg); color: var(--ink-soft);
+  display: grid; place-items: center; flex: none;
+}
+.sbtn svg { width: 24px; height: 24px; }
+.sbtn:active { transform: scale(.94); }
+
+.tabs {
+  flex: none; display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; padding: 2px 0;
+}
+.tabs::-webkit-scrollbar { display: none; }
+.tab {
+  flex: 1 0 auto; min-height: 46px; padding: 8px 16px; border-radius: 999px; border: 2px solid var(--line);
+  background: var(--surface); color: var(--ink); font-weight: 800; font-size: clamp(15px, 2.4vw, 20px); white-space: nowrap;
+}
+.tab:active { transform: scale(.96); }
+.tab[aria-pressed="true"] { background: var(--ink); border-color: var(--ink); color: var(--bg); }
+
+.board {
+  flex: 1; min-height: 0; display: grid; gap: clamp(8px, 1.6vw, 14px);
+  grid-template-columns: repeat(3, minmax(0, 1fr)); grid-template-rows: repeat(3, minmax(0, 1fr));
+  --label-scale: 1;
+}
+.board.swap { animation: swap .22s ease-out; }
+@keyframes swap { from { opacity: .0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+.tile {
+  --h: 150;
+  min-width: 0; min-height: 0; display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 4px; padding: 8px 6px 10px; border-radius: 22px; position: relative;
+  background: oklch(var(--tile-l) var(--tile-c) var(--h));
+  border: 2px solid oklch(var(--tile-bl) var(--tile-bc) var(--h));
+  color: var(--ink); transition: transform .08s; container-type: size;
+}
+.tile:active { transform: scale(.965); }
+.tile.hit { animation: hit .6s ease-out; }
+@keyframes hit { 0% { box-shadow: 0 0 0 0 oklch(.7 .15 var(--h) / .7); } 100% { box-shadow: 0 0 0 16px oklch(.7 .15 var(--h) / 0); } }
+.sym { flex: 1; min-height: 0; width: 100%; display: flex; align-items: center; justify-content: center; container-type: size; }
+.sym svg { height: 100%; width: auto; max-width: 100%; display: block; }
+.sym .emoji { font-size: min(72cqh, 46cqw); line-height: 1; font-family: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif; }
+.lbl {
+  font-weight: 800; text-align: center; line-height: 1.1; max-width: 100%; overflow-wrap: anywhere;
+  font-size: clamp(13px, min(calc(12cqw * var(--label-scale)), 16cqw, calc(16cqh * var(--label-scale))), 44px);
+}
+.flip svg { transform: scaleX(-1); }
+.edit .tile:not(.nav) { outline: 3px dashed var(--focus); outline-offset: -7px; }
+.edit .tile:not(.nav)::after {
+  content: ""; position: absolute; top: 8px; right: 8px; width: 26px; height: 26px; border-radius: 50%;
+  background: var(--focus) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 20h4L19 9l-4-4L4 16z'/%3E%3C/svg%3E") center/16px no-repeat;
+}
+.o { stroke: var(--ink); stroke-width: 3; stroke-linejoin: round; stroke-linecap: round; }
+
+/* dialogs */
+.scrim {
+  position: fixed; inset: 0; z-index: 30; background: var(--scrim); display: flex; align-items: center; justify-content: center;
+  padding-block: max(16px, env(safe-area-inset-top, 0px));
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.sheet {
+  background: var(--surface); color: var(--ink); border-radius: 26px; width: min(520px, 100%); max-height: 100%;
+  display: flex; flex-direction: column; border: 2px solid var(--line); user-select: text; -webkit-user-select: text;
+}
+.sheet h2 { margin: 0; font-size: 22px; font-weight: 800; }
+.shead { display: flex; align-items: center; gap: 12px; padding: 18px 20px 10px; }
+.shead h2 { flex: 1; }
+.sclose { width: 42px; height: 42px; border-radius: 50%; border: 0; background: var(--bg); display: grid; place-items: center; }
+.sclose svg { width: 22px; height: 22px; }
+.sbody { padding: 6px 20px 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 18px; }
+.fld { display: flex; flex-direction: column; gap: 6px; }
+.fld label, .fld .fl { font-weight: 800; font-size: 14px; color: var(--ink-soft); letter-spacing: .02em; }
+.fld .val { color: var(--ink); font-weight: 800; }
+select, input[type="text"] {
+  font: inherit; font-weight: 700; padding: 12px 14px; border-radius: 14px; border: 2px solid var(--line);
+  background: var(--bg); color: var(--ink); width: 100%; min-width: 0;
+}
+input[type="range"] { width: 100%; accent-color: var(--focus); height: 32px; }
+.row { display: flex; align-items: center; gap: 12px; }
+.row > :first-child { flex: 1; min-width: 0; }
+.seg { display: flex; border: 2px solid var(--line); border-radius: 14px; overflow: hidden; }
+.seg label { flex: 1; text-align: center; padding: 10px 6px; font-weight: 800; cursor: pointer; color: var(--ink); font-size: 15px; }
+.seg input { position: absolute; opacity: 0; pointer-events: none; }
+.seg input:checked + span { background: var(--focus); color: #fff; }
+.seg label span { display: block; margin: -10px -6px; padding: 10px 6px; }
+.seg label:has(input:focus-visible) { outline: 3px solid var(--focus); outline-offset: -3px; }
+.sw { position: relative; display: inline-block; width: 52px; height: 30px; flex: none; }
+.sw input { position: absolute; inset: 0; opacity: 0; width: 100%; height: 100%; margin: 0; cursor: pointer; }
+.sw i { position: absolute; inset: 0; border-radius: 999px; background: var(--line); transition: background .15s; pointer-events: none; }
+.sw i::after { content: ""; position: absolute; top: 3px; left: 3px; width: 24px; height: 24px; border-radius: 50%; background: #fff; transition: transform .15s; }
+.sw input:checked + i { background: var(--focus); }
+.sw input:checked + i::after { transform: translateX(22px); }
+.sw input:focus-visible + i { outline: 3px solid var(--focus); outline-offset: 2px; }
+.btn {
+  border: 2px solid var(--line); background: var(--bg); border-radius: 14px; padding: 12px 16px; font-weight: 800; color: var(--ink);
+}
+.btn.primary { background: var(--focus); border-color: var(--focus); color: #fff; }
+.btn.danger { color: var(--danger); }
+.btns { display: flex; gap: 10px; flex-wrap: wrap; }
+.btns .btn { flex: 1 1 auto; }
+.hues { display: flex; flex-wrap: wrap; gap: 8px; }
+.hue { width: 42px; height: 42px; border-radius: 50%; border: 3px solid transparent; background: oklch(var(--swatch-l) var(--swatch-c) var(--h)); }
+.hue[aria-pressed="true"] { border-color: var(--ink); }
+.hint { font-size: 14px; color: var(--ink-soft); margin: 0; font-weight: 600; }
+.toast {
+  position: fixed; left: 50%; bottom: max(18px, env(safe-area-inset-bottom, 0px)); transform: translate(-50%, 20px);
+  background: var(--ink); color: var(--bg); padding: 12px 20px; border-radius: 999px; font-weight: 800; opacity: 0;
+  pointer-events: none; transition: opacity .2s, transform .2s; z-index: 40; max-width: calc(100% - 32px); text-align: center;
+}
+.toast.on { opacity: 1; transform: translate(-50%, 0); }
+
+.top { flex: none; display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+.board { -webkit-text-size-adjust: 100%; }
+html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+
+/* wide screens held sideways (phones, tablets, laptops): sentence bar and page tabs move to a side column */
+@media (orientation: landscape) and (min-aspect-ratio: 5/4) {
+  .main { flex-direction: row; align-items: stretch; gap: 14px; }
+  .top { width: clamp(168px, 25vw, 260px); overflow-y: auto; scrollbar-width: none; }
+  .top::-webkit-scrollbar { display: none; }
+  .sentence { min-height: 72px; }
+  .stext { white-space: normal; overflow: hidden; font-size: clamp(18px, 2.4vw, 28px); line-height: 1.1; }
+  .tabs { flex-direction: column; overflow: visible; gap: 6px; padding: 0; }
+  .tab { flex: none; width: 100%; text-align: left; min-height: 42px; }
+}
+/* short screens (phones held sideways) */
+@media (max-height: 460px) {
+  .hdr { min-height: 48px; padding-block: 4px; gap: 10px; }
+  .logo { width: 42px; height: 28px; }
+  .hbtn { width: 40px; height: 40px; }
+  .hbtn svg { width: 22px; height: 22px; }
+  .main { gap: 8px; padding-block: 8px; }
+  .top { gap: 8px; }
+  .sentence { min-height: 56px; }
+  .say-btn { width: 42px; height: 42px; }
+  .say-btn svg { width: 28px; height: 28px; }
+  .tab { min-height: 36px; padding: 4px 14px; font-size: 15px; }
+  .tabs { gap: 5px; }
+}
+/* phones held upright: dialogs rise from the bottom */
+@media (max-width: 600px) and (orientation: portrait) {
+  .scrim { align-items: flex-end; padding: 0; }
+  .sheet { width: 100%; border-radius: 26px 26px 0 0; max-height: 92%; border-bottom: 0; }
+  .sbody { padding-bottom: max(20px, env(safe-area-inset-bottom, 0px)); }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}
+</style>
+
+<header class="hdr">
+  <svg class="logo" viewBox="0 0 124 80" aria-hidden="true">
+    <path d="M14 4H72Q84 4 84 16V36Q84 48 72 48H40L22 62V48H14Q2 48 2 36V16Q2 4 14 4Z" fill="#fff"/>
+    <circle cx="26" cy="26" r="4" fill="#212e4d"/><circle cx="43" cy="26" r="4" fill="#212e4d"/><circle cx="60" cy="26" r="4" fill="#212e4d"/>
+    <path d="M72 30H108Q120 30 120 42V56Q120 68 108 68H104V78L92 68H72Q60 68 60 56V42Q60 30 72 30Z" fill="#4da6f0" stroke="#212e4d" stroke-width="3"/>
+    <circle cx="82" cy="49" r="3.6" fill="#212e4d"/><circle cx="98" cy="49" r="3.6" fill="#212e4d"/>
+  </svg>
+  <h1 class="title">Mid-tech <b>AAC</b></h1>
+  <span class="sp"></span>
+  <button class="hbtn" id="btnSettings" aria-label="Settings">
+    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19.4 13a7.6 7.6 0 0 0 0-2l2.1-1.6a.5.5 0 0 0 .1-.6l-2-3.5a.5.5 0 0 0-.6-.2l-2.5 1a7.4 7.4 0 0 0-1.7-1l-.4-2.6a.5.5 0 0 0-.5-.4h-4a.5.5 0 0 0-.5.4l-.4 2.6c-.6.3-1.2.6-1.7 1l-2.5-1a.5.5 0 0 0-.6.2l-2 3.5a.5.5 0 0 0 .1.6L4.6 11a7.6 7.6 0 0 0 0 2l-2.1 1.6a.5.5 0 0 0-.1.6l2 3.5c.1.2.4.3.6.2l2.5-1c.5.4 1.1.7 1.7 1l.4 2.6c0 .2.2.4.5.4h4c.3 0 .5-.2.5-.4l.4-2.6c.6-.3 1.2-.6 1.7-1l2.5 1c.2.1.5 0 .6-.2l2-3.5a.5.5 0 0 0-.1-.6zM12 15.5A3.5 3.5 0 1 1 12 8.5a3.5 3.5 0 0 1 0 7z"/></svg>
+  </button>
+  <button class="hbtn" id="btnFull" aria-label="Full screen">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" id="icoFull"><path d="M4 9V4h5M15 4h5v5M20 15v5h-5M9 20H4v-5"/></svg>
+  </button>
+</header>
+
+<div class="editbar" id="editbar" hidden>
+  <span>Edit mode. Tap a button to change it.</span>
+  <button id="btnDone">Done</button>
+</div>
+
+<main class="main">
+  <div class="top">
+  <div class="sentence" id="sentence">
+    <button class="say-btn" id="btnSpeak" aria-label="Speak the word">
+      <svg viewBox="0 0 48 48" fill="none">
+        <path d="M6 18h8l11-9v30l-11-9H6z" fill="currentColor" stroke="currentColor" stroke-width="3" stroke-linejoin="round"/>
+        <g class="waves" stroke="currentColor" stroke-width="3.5" stroke-linecap="round"><path d="M32 18c3 3.5 3 8.500 0 12"/><path d="M37 12c6 6.500 6 17.500 0 24"/></g>
+      </svg>
+    </button>
+    <button class="stext empty" id="stext" aria-label="Speak the word"><span id="stextInner">Tap a button to speak…</span></button>
+    <button class="sbtn" id="btnClear" aria-label="Clear the word" hidden>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+    </button>
+  </div>
+  <nav class="tabs" id="tabs" aria-label="Board pages"></nav>
+  </div>
+  <div class="board" id="board" role="group" aria-label="Communication buttons"></div>
+</main>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<div class="scrim" id="settingsScrim" hidden>
+  <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="setTitle">
+    <div class="shead">
+      <h2 id="setTitle">Settings</h2>
+      <button class="sclose" id="setClose" aria-label="Close settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+    </div>
+    <div class="sbody">
+      <div class="fld">
+        <label for="selVoice">Voice</label>
+        <select id="selVoice"><option value="">Default voice</option></select>
+      </div>
+      <div class="fld">
+        <label for="rngRate">Speed <span class="val" id="vRate"></span></label>
+        <input type="range" id="rngRate" min="0.5" max="1.5" step="0.1">
+      </div>
+      <div class="fld">
+        <label for="rngPitch">Pitch <span class="val" id="vPitch"></span></label>
+        <input type="range" id="rngPitch" min="0.5" max="1.5" step="0.1">
+      </div>
+      <div class="fld">
+        <label for="rngVol">Volume <span class="val" id="vVol"></span></label>
+        <input type="range" id="rngVol" min="0.2" max="1" step="0.1">
+      </div>
+      <button class="btn" id="btnTest">Test the voice</button>
+      <div class="row">
+        <div class="fld"><span class="fl" id="lblSpeakTap">Speak when a button is tapped</span><p class="hint">Turn off to show the word first, then tap the speaker to hear it.</p></div>
+        <span class="sw"><input type="checkbox" id="chkSpeakTap" aria-labelledby="lblSpeakTap"><i></i></span>
+      </div>
+      <div class="fld">
+        <span class="fl" id="lblSize">Button text size</span>
+        <div class="seg" role="radiogroup" aria-labelledby="lblSize">
+          <label><input type="radio" name="size" value="1"><span>Medium</span></label>
+          <label><input type="radio" name="size" value="1.25"><span>Large</span></label>
+          <label><input type="radio" name="size" value="1.5"><span>Extra large</span></label>
+        </div>
+      </div>
+      <div class="btns">
+        <button class="btn primary" id="btnEdit">Edit buttons</button>
+        <button class="btn danger" id="btnReset">Reset all buttons</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="scrim" id="editScrim" hidden>
+  <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="edTitle">
+    <div class="shead">
+      <h2 id="edTitle">Edit button</h2>
+      <button class="sclose" id="edClose" aria-label="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+    </div>
+    <div class="sbody">
+      <div class="fld"><label for="edLabel">Label shown on the button</label><input type="text" id="edLabel" maxlength="24" autocomplete="off"></div>
+      <div class="fld"><label for="edSay">What it says out loud</label><input type="text" id="edSay" maxlength="80" autocomplete="off"><p class="hint">Leave empty to say the label.</p></div>
+      <div class="fld"><label for="edSym">Picture (type or paste one emoji)</label><input type="text" id="edSym" maxlength="8" autocomplete="off"><p class="hint">Leave empty to keep the original picture.</p></div>
+      <div class="fld"><span class="fl">Color</span><div class="hues" id="hues"></div></div>
+      <div class="btns">
+        <button class="btn primary" id="edSave">Save</button>
+        <button class="btn" id="edReset">Put back original</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  var HAND = '<rect class="o" x="2" y="16" width="22" height="26" rx="6" fill="#f7d3ae"/>' +
+    '<rect class="o" x="0.5" y="-13" width="5.5" height="22" rx="2.7" fill="#f7d3ae"/><rect class="o" x="7" y="-14" width="5.5" height="22" rx="2.7" fill="#f7d3ae"/>' +
+    '<rect class="o" x="13.5" y="-14" width="5.5" height="22" rx="2.7" fill="#f7d3ae"/><rect class="o" x="20" y="-12" width="5.5" height="20" rx="2.7" fill="#f7d3ae"/>' +
+    '<rect class="o" x="0" y="6" width="26" height="18" rx="8" fill="#f7d3ae"/>';
+  var SYM = {
+    yes: '<svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="46" fill="#17a34a"/><path d="M29 52L44 67L73 35" fill="none" stroke="#fff" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+    no: '<svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="46" fill="#dc3d36"/><path d="M33 33L67 67M67 33L33 67" fill="none" stroke="#fff" stroke-width="10" stroke-linecap="round"/></svg>',
+    help: '<svg viewBox="0 0 100 100"><g transform="translate(28.5 49.750) rotate(50)">' + HAND + '</g><g transform="translate(71.5 46.250) rotate(230)">' + HAND + '</g><g stroke="#f5b800" stroke-width="4.500" stroke-linecap="round"><path d="M30 26L36 34"/><path d="M18 38L27 41"/><path d="M43 16L45 26"/></g></svg>',
+    happy: '<svg viewBox="0 0 100 100"><circle class="o" cx="50" cy="50" r="42" fill="#f8c94d"/><path class="o" d="M30 45q7-9 14 0M56 45q7-9 14 0" fill="none"/><path class="o" d="M32 58Q50 82 68 58Z" fill="#8a2233"/><ellipse cx="50" cy="70" rx="8" ry="4.500" fill="#ef6a7a"/></svg>',
+    water: '<svg viewBox="0 0 100 100"><path d="M29 38H71L67 86Q66.500 90 62 90H38Q33.500 90 33 86Z" fill="#4da6f5"/><ellipse cx="50" cy="38" rx="21" ry="3.500" fill="#8fc7fa"/><path class="o" d="M26 12H74L68.500 87Q68 92 62 92H38Q32 92 31.500 87Z" fill="none"/><ellipse class="o" cx="50" cy="12" rx="24" ry="4.500" fill="none"/></svg>',
+    eat: '<svg viewBox="0 0 100 100"><path class="o" d="M20 10V34Q20 44 31 44Q42 44 42 34V10" fill="#8b94b3"/><path class="o" d="M31 10V30" fill="none"/><rect class="o" x="27" y="42" width="8" height="46" rx="4" fill="#8b94b3"/><ellipse class="o" cx="70" cy="27" rx="14" ry="18" fill="#8b94b3"/><rect class="o" x="66" y="42" width="8" height="46" rx="4" fill="#8b94b3"/></svg>',
+    home: '<svg viewBox="0 0 100 100"><rect class="o" x="62" y="20" width="10" height="20" fill="#ef4f4f"/><rect class="o" x="22" y="46" width="52" height="40" fill="#fdf0d5"/><path class="o" d="M12 52L48 20L84 52Z" fill="#ef4f4f"/><rect class="o" x="32" y="60" width="14" height="26" rx="7" fill="#a86a2b"/><rect class="o" x="54" y="58" width="14" height="14" fill="#cfe3ff"/><path class="o" d="M8 88H78" fill="none"/><circle cx="84" cy="81" r="7" fill="#2fa15a"/></svg>',
+    bathroom: '<svg viewBox="0 0 100 100"><rect class="o" x="32" y="8" width="36" height="28" rx="5" fill="#fff"/><path class="o" d="M20 44H80Q80 66 64 72V82L70 90H30L36 82V72Q20 66 20 44Z" fill="#fff"/><path class="o" d="M20 44Q50 52 80 44" fill="none"/></svg>',
+    more: '<svg viewBox="0 0 100 100"><path class="o" d="M8 38H52V18L94 50L52 82V62H8Z" fill="#a66bbd"/></svg>'
+  };
+
+  var PAGES = {
+    home: { name: "Home", next: "feelings", items: [
+      { id: "yes", label: "Yes", say: "Yes", sym: "yes", hue: 150 },
+      { id: "no", label: "No", say: "No", sym: "no", hue: 12 },
+      { id: "help", label: "Help", say: "Help", sym: "help", hue: 245 },
+      { id: "happy", label: "I’m Happy", say: "I’m happy", sym: "happy", hue: 90 },
+      { id: "water", label: "Water", say: "Water", sym: "water", hue: 300 },
+      { id: "eat", label: "Eat", say: "Eat", sym: "eat", hue: 168 },
+      { id: "home", label: "Home", say: "Home", sym: "home", hue: 268 },
+      { id: "bathroom", label: "Bathroom", say: "Bathroom", sym: "bathroom", hue: 205 }
+    ]},
+    feelings: { name: "Feelings", items: [
+      { id: "happy2", label: "Happy", say: "I’m happy", emoji: "😊", hue: 90 },
+      { id: "sad", label: "Sad", say: "I’m sad", emoji: "😢", hue: 245 },
+      { id: "angry", label: "Angry", say: "I’m angry", emoji: "😠", hue: 12 },
+      { id: "scared", label: "Scared", say: "I’m scared", emoji: "😨", hue: 295 },
+      { id: "tired", label: "Tired", say: "I’m tired", emoji: "😴", hue: 268 },
+      { id: "sick", label: "Sick", say: "I feel sick", emoji: "🤒", hue: 140 },
+      { id: "hurt", label: "Hurt", say: "I’m hurt", emoji: "🤕", hue: 40 },
+      { id: "hot", label: "Hot", say: "I’m hot", emoji: "🥵", hue: 15 },
+      { id: "cold", label: "Cold", say: "I’m cold", emoji: "🥶", hue: 220 }
+    ]},
+    play: { name: "Play", items: [
+      { id: "play", label: "Play", say: "I want to play", emoji: "🎮", hue: 268 },
+      { id: "ball", label: "Ball", say: "Ball", emoji: "⚽", hue: 150 },
+      { id: "toys", label: "Toys", say: "Toys", emoji: "🧸", hue: 40 },
+      { id: "draw", label: "Draw", say: "Draw", emoji: "🎨", hue: 320 },
+      { id: "book", label: "Book", say: "Book", emoji: "📖", hue: 245 },
+      { id: "music", label: "Music", say: "Music", emoji: "🎵", hue: 205 },
+      { id: "tv", label: "TV", say: "TV", emoji: "📺", hue: 295 },
+      { id: "outside", label: "Outside", say: "Go outside", emoji: "🌳", hue: 140 },
+      { id: "dance", label: "Dance", say: "Dance", emoji: "💃", hue: 12 }
+    ]},
+    greetings: { name: "Greetings", items: [
+      { id: "hello", label: "Hello", say: "Hello", emoji: "👋", hue: 90 },
+      { id: "bye", label: "Goodbye", say: "Goodbye", emoji: "👋", hue: 168 },
+      { id: "morning", label: "Good morning", say: "Good morning", emoji: "🌅", hue: 40 },
+      { id: "night", label: "Good night", say: "Good night", emoji: "🌙", hue: 268 },
+      { id: "please", label: "Please", say: "Please", emoji: "🙏", hue: 205 },
+      { id: "thanks", label: "Thank you", say: "Thank you", emoji: "💛", hue: 85 },
+      { id: "sorry", label: "Sorry", say: "I’m sorry", emoji: "😔", hue: 245 },
+      { id: "love", label: "I love you", say: "I love you", emoji: "❤️", hue: 12 },
+      { id: "excuse", label: "Excuse me", say: "Excuse me", emoji: "🙋", hue: 295 }
+    ]},
+    exchange: { name: "Exchange", items: [
+      { id: "want", label: "I want", say: "I want", emoji: "🙋", hue: 168 },
+      { id: "giveme", label: "Give me", say: "Give me", emoji: "🤲", hue: 205 },
+      { id: "myturn", label: "My turn", say: "My turn", emoji: "👈", hue: 90 },
+      { id: "yourturn", label: "Your turn", say: "Your turn", emoji: "👉", hue: 245 },
+      { id: "again", label: "Again", say: "Again", emoji: "🔁", hue: 150 },
+      { id: "more2", label: "More", say: "More", emoji: "➕", hue: 320 },
+      { id: "alldone", label: "All done", say: "All done", emoji: "✅", hue: 140 },
+      { id: "stop", label: "Stop", say: "Stop", emoji: "✋", hue: 12 },
+      { id: "wait", label: "Wait", say: "Wait", emoji: "⏳", hue: 40 }
+    ]}
+  };
+  var HUES = [12, 40, 85, 140, 168, 205, 245, 268, 295, 320];
+
+  var KEY = "midtech-aac-v1";
+  var state = {
+    page: "home", current: "", edit: false, editing: null, hue: 150,
+    s: { voiceURI: "", rate: 1, pitch: 1, volume: 1, speakTap: true, size: "1" },
+    custom: {}
+  };
+  try {
+    var saved = JSON.parse(localStorage.getItem(KEY) || "null");
+    if (saved) {
+      if (saved.s) Object.keys(saved.s).forEach(function (k) { state.s[k] = saved.s[k]; });
+      if (saved.custom) state.custom = saved.custom;
+    }
+  } catch (e) {}
+  function persist() {
+    try { localStorage.setItem(KEY, JSON.stringify({ s: state.s, custom: state.custom })); } catch (e) {}
+  }
+
+  var $ = function (id) { return document.getElementById(id); };
+  var synth = ("speechSynthesis" in window) ? window.speechSynthesis : null;
+  var voices = [];
+
+
+  var toastTimer;
+  function toast(msg) {
+    var t = $("toast"); t.textContent = msg; t.classList.add("on");
+    clearTimeout(toastTimer); toastTimer = setTimeout(function () { t.classList.remove("on"); }, 2600);
+  }
+
+  function speak(text) {
+    if (!text) return;
+    if (!synth) { toast("This browser can't speak out loud."); return; }
+    try {
+      synth.cancel();
+      var u = new SpeechSynthesisUtterance(text);
+      u.rate = +state.s.rate; u.pitch = +state.s.pitch; u.volume = +state.s.volume;
+      if (state.s.voiceURI) {
+        for (var i = 0; i < voices.length; i++) if (voices[i].voiceURI === state.s.voiceURI) { u.voice = voices[i]; u.lang = voices[i].lang; break; }
+      }
+      u.onstart = function () { $("sentence").classList.add("speaking"); };
+      u.onend = u.onerror = function () { $("sentence").classList.remove("speaking"); };
+      synth.speak(u);
+    } catch (e) { toast("Speech did not start. Try again."); }
+  }
+  function stopSpeech() { try { if (synth) synth.cancel(); } catch (e) {} $("sentence").classList.remove("speaking"); }
+
+  function loadVoices() {
+    if (!synth) return;
+    voices = synth.getVoices() || [];
+    var sel = $("selVoice"), lang = (navigator.language || "en").slice(0, 2).toLowerCase();
+    var sorted = voices.slice().sort(function (a, b) {
+      var am = a.lang.toLowerCase().indexOf(lang) === 0 ? 0 : 1, bm = b.lang.toLowerCase().indexOf(lang) === 0 ? 0 : 1;
+      return am - bm || a.name.localeCompare(b.name);
+    });
+    sel.innerHTML = "";
+    var d = document.createElement("option"); d.value = ""; d.textContent = "Default voice"; sel.appendChild(d);
+    sorted.forEach(function (v) {
+      var o = document.createElement("option"); o.value = v.voiceURI; o.textContent = v.name + " (" + v.lang + ")"; sel.appendChild(o);
+    });
+    sel.value = state.s.voiceURI || "";
+    if (sel.value !== (state.s.voiceURI || "")) sel.value = "";
+  }
+  if (synth) { loadVoices(); try { synth.addEventListener("voiceschanged", loadVoices); } catch (e) { synth.onvoiceschanged = loadVoices; } }
+
+  function renderBar() {
+    var has = state.current.length > 0, st = $("stext");
+    $("stextInner").textContent = has ? state.current : "Tap a button to speak\u2026";
+    st.classList.toggle("empty", !has);
+    $("btnClear").hidden = !has;
+    st.scrollLeft = 0;
+  }
+  function speakSentence() {
+    if (!state.current) { toast("Nothing to say yet. Tap a button first."); return; }
+    speak(state.current);
+  }
+
+  function eff(pageId, item) {
+    var c = state.custom[pageId + ":" + item.id], o = {};
+    Object.keys(item).forEach(function (k) { o[k] = item[k]; });
+    if (c) {
+      if (c.label) o.label = c.label;
+      if (c.say) o.say = c.say;
+      if (typeof c.hue === "number") o.hue = c.hue;
+      if (c.emoji) { o.emoji = c.emoji; o.sym = null; }
+    }
+    return o;
+  }
+  function pulse(el) { el.classList.remove("hit"); void el.offsetWidth; el.classList.add("hit"); }
+
+  function renderBoard(animate) {
+    var page = PAGES[state.page], board = $("board");
+    board.innerHTML = "";
+    board.classList.toggle("edit", state.edit);
+    board.style.setProperty("--label-scale", state.s.size);
+    function addTile(o, nav) {
+      var b = document.createElement("button");
+      b.type = "button"; b.className = "tile" + (nav ? " nav" : ""); b.style.setProperty("--h", o.hue);
+      var sym = document.createElement("div"); sym.className = "sym" + (o.flip ? " flip" : "");
+      if (o.sym) sym.innerHTML = SYM[o.sym];
+      else { var em = document.createElement("span"); em.className = "emoji"; em.textContent = o.emoji || ""; sym.appendChild(em); }
+      var lb = document.createElement("div"); lb.className = "lbl"; lb.textContent = o.label;
+      b.appendChild(sym); b.appendChild(lb);
+      b.setAttribute("aria-label", nav ? o.label : (state.edit ? "Edit " + o.label : o.label));
+      b.addEventListener("click", function () { onTile(o, b, nav); });
+      board.appendChild(b);
+    }
+    page.items.forEach(function (it) { var o = eff(state.page, it); o.pageId = state.page; addTile(o, false); });
+    if (state.page === "home") addTile({ label: "More", sym: "more", hue: 320, go: page.next }, true);
+    renderTabs();
+    if (animate) { board.classList.remove("swap"); void board.offsetWidth; board.classList.add("swap"); }
+  }
+
+  var TABS = [["home", "Home"], ["feelings", "Feelings"], ["play", "Play"], ["greetings", "Greetings"], ["exchange", "Exchange"]];
+  function renderTabs() {
+    var box = $("tabs"); box.innerHTML = "";
+    TABS.forEach(function (t) {
+      var b = document.createElement("button");
+      b.type = "button"; b.className = "tab"; b.textContent = t[1];
+      var on = state.page === t[0];
+      b.setAttribute("aria-pressed", on ? "true" : "false");
+      if (on) b.setAttribute("aria-current", "page");
+      b.addEventListener("click", function () { if (state.page !== t[0]) go(t[0]); });
+      box.appendChild(b);
+    });
+    var a = box.querySelector("[aria-current]");
+    if (a && a.scrollIntoView) { try { a.scrollIntoView({ block: "nearest", inline: "nearest" }); } catch (e) {} }
+  }
+
+  function onTile(o, el, nav) {
+    if (nav) { go(o.go); return; }
+    if (state.edit) { openEditor(o); return; }
+    state.current = o.say;
+    renderBar(); pulse(el);
+    if (state.s.speakTap) speak(o.say);
+  }
+  function go(id) { state.page = id; renderBoard(true); }
+
+  function setEdit(on) {
+    state.edit = on; $("editbar").hidden = !on; renderBoard(false);
+  }
+  var lastFocus = null;
+  function openScrim(id, focusId) {
+    lastFocus = document.activeElement; $(id).hidden = false;
+    var f = $(focusId); if (f) f.focus();
+  }
+  function closeScrim(id) {
+    $(id).hidden = true;
+    if (lastFocus && lastFocus.focus) { try { lastFocus.focus(); } catch (e) {} }
+  }
+  function buildHues() {
+    var box = $("hues"); box.innerHTML = "";
+    HUES.forEach(function (h) {
+      var b = document.createElement("button");
+      b.type = "button"; b.className = "hue"; b.style.setProperty("--h", h); b.setAttribute("aria-label", "Color " + h);
+      b.setAttribute("aria-pressed", state.hue === h ? "true" : "false");
+      b.addEventListener("click", function () {
+        state.hue = h;
+        Array.prototype.forEach.call(box.children, function (c) { c.setAttribute("aria-pressed", "false"); });
+        b.setAttribute("aria-pressed", "true");
+      });
+      box.appendChild(b);
+    });
+  }
+  function openEditor(o) {
+    state.editing = o.pageId + ":" + o.id;
+    var c = state.custom[state.editing] || {};
+    $("edLabel").value = o.label; $("edSay").value = o.say;
+    $("edSym").value = c.emoji || (o.sym ? "" : (o.emoji || ""));
+    state.hue = o.hue; buildHues();
+    openScrim("editScrim", "edLabel");
+  }
+  function saveEditor() {
+    var label = $("edLabel").value.trim();
+    if (!label) { toast("Give the button a label."); $("edLabel").focus(); return; }
+    var say = $("edSay").value.trim() || label, emoji = $("edSym").value.trim();
+    state.custom[state.editing] = { label: label, say: say, hue: state.hue, emoji: emoji };
+    persist(); closeScrim("editScrim"); renderBoard(false); toast("Saved");
+  }
+  function resetTile() {
+    delete state.custom[state.editing]; persist(); closeScrim("editScrim"); renderBoard(false); toast("Original button restored");
+  }
+
+  function syncSettings() {
+    $("rngRate").value = state.s.rate; $("rngPitch").value = state.s.pitch; $("rngVol").value = state.s.volume;
+    $("vRate").textContent = (+state.s.rate).toFixed(1) + "x"; $("vPitch").textContent = (+state.s.pitch).toFixed(1);
+    $("vVol").textContent = Math.round(state.s.volume * 100) + "%";
+    $("chkSpeakTap").checked = !!state.s.speakTap;
+    Array.prototype.forEach.call(document.getElementsByName("size"), function (r) { r.checked = r.value === String(state.s.size); });
+    $("selVoice").value = state.s.voiceURI || "";
+    if (!synth) { $("selVoice").disabled = true; }
+  }
+  var resetArmed = false, resetTimer;
+  function bindSettings() {
+    $("btnSettings").addEventListener("click", function () { syncSettings(); openScrim("settingsScrim", "setClose"); });
+    $("setClose").addEventListener("click", function () { closeScrim("settingsScrim"); });
+    $("selVoice").addEventListener("change", function (e) { state.s.voiceURI = e.target.value; persist(); });
+    [["rngRate", "rate"], ["rngPitch", "pitch"], ["rngVol", "volume"]].forEach(function (p) {
+      $(p[0]).addEventListener("input", function (e) { state.s[p[1]] = +e.target.value; persist(); syncSettings(); });
+    });
+    $("btnTest").addEventListener("click", function () { speak("Hello, this is how I sound."); });
+    $("chkSpeakTap").addEventListener("change", function (e) { state.s.speakTap = e.target.checked; persist(); });
+    Array.prototype.forEach.call(document.getElementsByName("size"), function (r) {
+      r.addEventListener("change", function () { state.s.size = r.value; persist(); $("board").style.setProperty("--label-scale", r.value); });
+    });
+    $("btnEdit").addEventListener("click", function () { closeScrim("settingsScrim"); lastFocus = null; setEdit(true); });
+    $("btnReset").addEventListener("click", function () {
+      var b = $("btnReset");
+      if (!resetArmed) {
+        resetArmed = true; b.textContent = "Tap again to confirm";
+        resetTimer = setTimeout(function () { resetArmed = false; b.textContent = "Reset all buttons"; }, 3500);
+        return;
+      }
+      clearTimeout(resetTimer); resetArmed = false; b.textContent = "Reset all buttons";
+      state.custom = {}; persist(); renderBoard(false); toast("All buttons restored");
+    });
+    $("btnDone").addEventListener("click", function () { setEdit(false); });
+    $("edSave").addEventListener("click", saveEditor);
+    $("edReset").addEventListener("click", resetTile);
+    $("edClose").addEventListener("click", function () { closeScrim("editScrim"); });
+    ["settingsScrim", "editScrim"].forEach(function (id) {
+      $(id).addEventListener("click", function (e) { if (e.target === $(id)) closeScrim(id); });
+    });
+    ["edLabel", "edSay", "edSym"].forEach(function (id) {
+      $(id).addEventListener("keydown", function (e) { if (e.key === "Enter") saveEditor(); });
+    });
+    document.addEventListener("keydown", function (e) {
+      if (e.key !== "Escape") return;
+      if (!$("editScrim").hidden) closeScrim("editScrim");
+      else if (!$("settingsScrim").hidden) closeScrim("settingsScrim");
+    });
+  }
+
+
+  var FULL_OUT = "M4 9V4h5M15 4h5v5M20 15v5h-5M9 20H4v-5", FULL_IN = "M9 4v5H4M15 4v5h5M20 15h-5v5M4 15h5v5";
+  function bindFull() {
+    var btn = $("btnFull");
+    if (!document.fullscreenEnabled) { btn.hidden = true; return; }
+    btn.addEventListener("click", function () {
+      try {
+        var p = document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen();
+        if (p && p.catch) p.catch(function () { toast("Full screen isn't available here."); });
+      } catch (e) { toast("Full screen isn't available here."); }
+    });
+    document.addEventListener("fullscreenchange", function () {
+      $("icoFull").firstElementChild.setAttribute("d", document.fullscreenElement ? FULL_IN : FULL_OUT);
+    });
+  }
+  var wl = null;
+  function keepAwake() {
+    try {
+      if ("wakeLock" in navigator && document.visibilityState === "visible" && !wl) {
+        navigator.wakeLock.request("screen").then(function (l) { wl = l; l.addEventListener("release", function () { wl = null; }); }).catch(function () {});
+      }
+    } catch (e) {}
+  }
+  document.addEventListener("visibilitychange", keepAwake);
+  document.addEventListener("pointerdown", keepAwake, { once: true });
+
+  $("btnSpeak").addEventListener("click", speakSentence);
+  $("stext").addEventListener("click", speakSentence);
+  $("btnClear").addEventListener("click", function () { state.current = ""; renderBar(); stopSpeech(); });
+  bindSettings(); bindFull();
+  syncSettings(); renderBar(); renderBoard(false);
+})();
+</script>
+
+</body></html>
