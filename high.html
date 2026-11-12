@@ -1,0 +1,1437 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>High-tech AAC</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&display=swap">
+<style>
+/* Layout: one-screen board. Navy title bar, sentence bar, then a 3x3 grid of large pastel tiles that fills the rest. */
+:root {
+  --bg: #f4f7fc;
+  --surface: #ffffff;
+  --bar-bg: #212e4d;
+  --bar-ink: #ffffff;
+  --accent: #4da6f0;
+  --ink: #1d2a48;
+  --ink-soft: #6b7690;
+  --line: #d3ddef;
+  --focus: #2f7de0;
+  --chip: #324164;
+  --sug: #e8f2ff; --sug-line: #bcd6f6;
+  --tile-l: .93; --tile-c: .055;
+  --tile-bl: .85; --tile-bc: .075;
+  --swatch-l: .84; --swatch-c: .1;
+  --danger: #c2362f;
+  --scrim: rgba(18, 27, 48, .55);
+  --font: "Nunito", ui-rounded, "Segoe UI", system-ui, sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0e1526; --surface: #17203a; --bar-bg: #18233f; --bar-ink: #fff; --accent: #5db1f5;
+    --ink: #eaf0ff; --ink-soft: #9ca8c6; --line: #2b3857; --focus: #7db6ff; --chip: #2a3860; --sug: #1f3156; --sug-line: #34497a;
+    --tile-l: .31; --tile-c: .06; --tile-bl: .43; --tile-bc: .09;
+    --swatch-l: .5; --swatch-c: .12; --danger: #ff8a82; --scrim: rgba(3, 7, 16, .7);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0e1526; --surface: #17203a; --bar-bg: #18233f; --bar-ink: #fff; --accent: #5db1f5;
+  --ink: #eaf0ff; --ink-soft: #9ca8c6; --line: #2b3857; --focus: #7db6ff; --chip: #2a3860; --sug: #1f3156; --sug-line: #34497a;
+  --tile-l: .31; --tile-c: .06; --tile-bl: .43; --tile-bc: .09;
+  --swatch-l: .5; --swatch-c: .12; --danger: #ff8a82; --scrim: rgba(3, 7, 16, .7);
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+html, body { height: 100%; }
+body {
+  background: var(--bg); color: var(--ink);
+  font-family: var(--font); font-size: 16px; line-height: 1.3;
+  margin: 0; display: flex; flex-direction: column; overflow: hidden;
+  -webkit-tap-highlight-color: transparent; user-select: none; -webkit-user-select: none;
+}
+body::before {
+  content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px);
+  background: var(--bar-bg); z-index: 10;
+}
+button { font: inherit; color: inherit; cursor: pointer; }
+:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+
+/* header */
+.hdr {
+  flex: none; background: var(--bar-bg); color: var(--bar-ink);
+  padding-block: 10px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  display: flex; align-items: center; gap: 12px; min-height: 64px;
+}
+.logo { width: 54px; height: 36px; flex: none; }
+.title { font-weight: 800; font-size: clamp(20px, 3.4vw, 30px); letter-spacing: -.01em; margin: 0; white-space: nowrap; }
+.title b { color: var(--accent); font-weight: 800; }
+.chip {
+  background: var(--chip); color: var(--bar-ink); border-radius: 999px; padding: 4px 12px;
+  font-weight: 700; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0;
+}
+.sp { flex: 1; }
+.hbtn {
+  width: 46px; height: 46px; border-radius: 50%; border: 0; background: var(--chip); color: var(--bar-ink);
+  display: grid; place-items: center; flex: none;
+}
+.hbtn:active { transform: scale(.94); }
+.hbtn svg { width: 24px; height: 24px; }
+.hdr :focus-visible { outline-color: #fff; }
+
+/* edit banner */
+.editbar {
+  flex: none; display: flex; align-items: center; gap: 12px; background: var(--accent); color: #0d1b33;
+  padding-block: 8px; font-weight: 800;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.editbar span { flex: 1; min-width: 0; }
+.editbar button { border: 0; background: #0d1b33; color: #fff; border-radius: 999px; padding: 8px 18px; font-weight: 800; }
+
+/* main */
+.main {
+  flex: 1; min-height: 0; display: flex; flex-direction: column; gap: 12px; padding-block: 12px;
+  padding-left: max(14px, env(safe-area-inset-left, 0px));
+  padding-right: max(14px, env(safe-area-inset-right, 0px));
+}
+.sentence {
+  flex: none; display: flex; align-items: center; gap: 6px; background: var(--surface);
+  border: 2px solid var(--line); border-radius: 22px; min-height: 64px; padding: 6px 8px 6px 6px;
+}
+.say-btn {
+  width: 50px; height: 50px; border-radius: 16px; border: 0; background: transparent; color: var(--ink);
+  display: grid; place-items: center; flex: none;
+}
+.say-btn svg { width: 34px; height: 34px; }
+.say-btn:active { transform: scale(.94); }
+.waves path { transition: opacity .2s; }
+.sentence.speaking .waves path { animation: wave 1s infinite ease-in-out; }
+.sentence.speaking .waves path:nth-child(2) { animation-delay: .25s; }
+@keyframes wave { 0%, 100% { opacity: .25; } 50% { opacity: 1; } }
+.stext {
+  flex: 1; min-width: 0; font-size: clamp(22px, 4vw, 36px); font-weight: 800; white-space: nowrap;
+  overflow-x: auto; scrollbar-width: none; padding: 8px 6px; align-self: stretch; display: flex; align-items: center;
+  cursor: pointer; border: 0; background: none; text-align: left;
+}
+.stext::-webkit-scrollbar { display: none; }
+.stext span { display: block; }
+.stext.empty span { color: var(--ink-soft); font-style: italic; font-weight: 600; }
+.sbtn {
+  width: 46px; height: 46px; border-radius: 14px; border: 0; background: var(--bg); color: var(--ink-soft);
+  display: grid; place-items: center; flex: none;
+}
+.sbtn svg { width: 24px; height: 24px; }
+.sbtn:active { transform: scale(.94); }
+
+/* tabs */
+.tabs {
+  flex: none; display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; padding: 2px 0;
+}
+.tabs::-webkit-scrollbar { display: none; }
+.tab {
+  flex: 1 0 auto; min-height: 46px; padding: 8px 16px; border-radius: 999px; border: 2px solid var(--line);
+  background: var(--surface); color: var(--ink); font-weight: 800; font-size: clamp(15px, 2.4vw, 20px); white-space: nowrap;
+}
+.tab:active { transform: scale(.96); }
+.tab[aria-pressed="true"] { background: var(--ink); border-color: var(--ink); color: var(--bg); }
+
+.tab.place { border-color: var(--focus); display: inline-flex; align-items: center; justify-content: flex-start; gap: 6px; }
+.tab.place svg { width: 18px; height: 18px; flex: none; color: var(--focus); }
+.tab.place span { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.tab:disabled { opacity: .75; cursor: default; }
+.tab:disabled:active { transform: none; }
+.btn[aria-pressed="true"] { background: var(--ink); border-color: var(--ink); color: var(--bg); }
+.sheet.pin { width: min(360px, 100%); }
+.pin .shead { justify-content: center; }
+.pin .shead h2 { text-align: center; }
+.pin .hint { text-align: center; min-height: 2.6em; }
+.pindots { display: flex; gap: 16px; justify-content: center; padding: 4px 0 2px; }
+.pindots i { width: 16px; height: 16px; border-radius: 50%; border: 2px solid var(--ink-soft); display: block; }
+.pindots i.on { background: var(--ink); border-color: var(--ink); }
+.pindots.shake { animation: shake .35s; }
+@keyframes shake { 0%, 100% { transform: none; } 25% { transform: translateX(-8px); } 75% { transform: translateX(8px); } }
+.keypad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; width: min(300px, 100%); margin: 0 auto; }
+.keypad.off { opacity: .45; pointer-events: none; }
+.key { height: 58px; border-radius: 18px; border: 2px solid var(--line); background: var(--bg); color: var(--ink); font-size: 24px; font-weight: 800; }
+.key:active { transform: scale(.95); }
+.key svg { width: 26px; height: 26px; }
+.plist { display: flex; flex-direction: column; gap: 10px; }
+.prow { border: 2px solid var(--line); border-radius: 16px; padding: 12px; display: flex; flex-direction: column; gap: 8px; }
+.prow .pn { font-weight: 800; overflow-wrap: anywhere; }
+.prow small { color: var(--ink-soft); font-weight: 600; }
+.prow .btns { align-items: center; }
+.prow .btn, .prow select { padding: 8px 12px; font-size: 14px; flex: 0 1 auto; width: auto; }
+
+.sugg { flex: none; display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; padding: 2px 0; }
+.sugg::-webkit-scrollbar { display: none; }
+.chipbtn {
+  flex: 0 0 auto; min-height: 44px; padding: 8px 16px; border-radius: 14px; border: 2px solid var(--sug-line);
+  background: var(--sug); color: var(--ink); font-weight: 800; font-size: clamp(15px, 2.4vw, 19px); white-space: nowrap;
+}
+.chipbtn:active { transform: scale(.96); }
+.histempty {
+  grid-column: 1 / -1; grid-row: 1 / -1; display: flex; flex-direction: column; align-items: center; justify-content: center;
+  text-align: center; gap: 8px; border: 2px dashed var(--line); border-radius: 22px; color: var(--ink-soft); padding: 20px; font-weight: 700;
+}
+.histempty strong { color: var(--ink); font-size: clamp(18px, 3vw, 26px); }
+.tile.hist .lbl {
+  font-size: clamp(12px, min(9cqw, 12cqh), 24px); display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden;
+}
+
+.board.kbmode { display: flex; flex-direction: column; gap: clamp(6px, 1.2vw, 10px); container-type: size; }
+.krow { flex: 1 1 0; min-height: 0; display: flex; gap: clamp(5px, 1vw, 10px); }
+.krow.r2 { padding: 0 5%; }
+.kkey {
+  flex: 1 1 0; min-width: 0; min-height: 0; border-radius: 14px; border: 2px solid var(--line); background: var(--surface);
+  color: var(--ink); font-weight: 800; text-transform: uppercase; font-size: clamp(16px, min(5cqw, 9cqh), 36px);
+  display: flex; align-items: center; justify-content: center; gap: .4em; padding: 0;
+}
+.kkey:active { transform: scale(.95); background: var(--sug); }
+.kkey svg { width: 1.3em; height: 1.3em; }
+.kkey.wide { flex: 1.6 1 0; }
+.kkey.space { flex: 5 1 0; text-transform: none; font-weight: 700; color: var(--ink-soft); }
+.kkey.speak { flex: 2.4 1 0; background: var(--focus); border-color: var(--focus); color: #fff; text-transform: none; }
+
+/* board */
+.board {
+  flex: 1; min-height: 0; display: grid; gap: clamp(8px, 1.6vw, 14px);
+  grid-template-columns: repeat(3, minmax(0, 1fr)); grid-template-rows: repeat(3, minmax(0, 1fr));
+  --label-scale: 1;
+}
+.board.swap { animation: swap .22s ease-out; }
+@keyframes swap { from { opacity: .0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+.tile {
+  --h: 150;
+  min-width: 0; min-height: 0; display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 4px; padding: 8px 6px 10px; border-radius: 22px; position: relative;
+  background: oklch(var(--tile-l) var(--tile-c) var(--h));
+  border: 2px solid oklch(var(--tile-bl) var(--tile-bc) var(--h));
+  color: var(--ink); transition: transform .08s; container-type: size;
+}
+.tile:active { transform: scale(.965); }
+.tile.hit { animation: hit .6s ease-out; }
+@keyframes hit { 0% { box-shadow: 0 0 0 0 oklch(.7 .15 var(--h) / .7); } 100% { box-shadow: 0 0 0 16px oklch(.7 .15 var(--h) / 0); } }
+.sym { flex: 1; min-height: 0; width: 100%; display: flex; align-items: center; justify-content: center; container-type: size; }
+.sym svg { height: 100%; width: auto; max-width: 100%; display: block; }
+.sym .emoji { font-size: min(72cqh, 46cqw); line-height: 1; font-family: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif; }
+.lbl {
+  font-weight: 800; text-align: center; line-height: 1.1; max-width: 100%; overflow-wrap: anywhere;
+  font-size: clamp(13px, min(calc(12cqw * var(--label-scale)), 16cqw, calc(16cqh * var(--label-scale))), 44px);
+}
+.flip svg { transform: scaleX(-1); }
+.edit .tile:not(.nav) { outline: 3px dashed var(--focus); outline-offset: -7px; }
+.edit .tile:not(.nav)::after {
+  content: ""; position: absolute; top: 8px; right: 8px; width: 26px; height: 26px; border-radius: 50%;
+  background: var(--focus) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 20h4L19 9l-4-4L4 16z'/%3E%3C/svg%3E") center/16px no-repeat;
+}
+.o { stroke: var(--ink); stroke-width: 3; stroke-linejoin: round; stroke-linecap: round; }
+
+/* dialogs */
+.scrim {
+  position: fixed; inset: 0; z-index: 30; background: var(--scrim); display: flex; align-items: center; justify-content: center;
+  padding-block: max(16px, env(safe-area-inset-top, 0px));
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.sheet {
+  background: var(--surface); color: var(--ink); border-radius: 26px; width: min(520px, 100%); max-height: 100%;
+  display: flex; flex-direction: column; border: 2px solid var(--line); user-select: text; -webkit-user-select: text;
+}
+.sheet h2 { margin: 0; font-size: 22px; font-weight: 800; }
+.shead { display: flex; align-items: center; gap: 12px; padding: 18px 20px 10px; }
+.shead h2 { flex: 1; }
+.sclose { width: 42px; height: 42px; border-radius: 50%; border: 0; background: var(--bg); display: grid; place-items: center; }
+.sclose svg { width: 22px; height: 22px; }
+.sbody { padding: 6px 20px 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 18px; }
+.fld { display: flex; flex-direction: column; gap: 6px; }
+.fld label, .fld .fl { font-weight: 800; font-size: 14px; color: var(--ink-soft); letter-spacing: .02em; }
+.fld .val { color: var(--ink); font-weight: 800; }
+select, input[type="text"] {
+  font: inherit; font-weight: 700; padding: 12px 14px; border-radius: 14px; border: 2px solid var(--line);
+  background: var(--bg); color: var(--ink); width: 100%; min-width: 0;
+}
+input[type="range"] { width: 100%; accent-color: var(--focus); height: 32px; }
+.row { display: flex; align-items: center; gap: 12px; }
+.row > :first-child { flex: 1; min-width: 0; }
+.seg { display: flex; border: 2px solid var(--line); border-radius: 14px; overflow: hidden; }
+.seg label { flex: 1; text-align: center; padding: 10px 6px; font-weight: 800; cursor: pointer; color: var(--ink); font-size: 15px; }
+.seg input { position: absolute; opacity: 0; pointer-events: none; }
+.seg input:checked + span { background: var(--focus); color: #fff; }
+.seg label span { display: block; margin: -10px -6px; padding: 10px 6px; }
+.seg label:has(input:focus-visible) { outline: 3px solid var(--focus); outline-offset: -3px; }
+.sw { position: relative; display: inline-block; width: 52px; height: 30px; flex: none; }
+.sw input { position: absolute; inset: 0; opacity: 0; width: 100%; height: 100%; margin: 0; cursor: pointer; }
+.sw i { position: absolute; inset: 0; border-radius: 999px; background: var(--line); transition: background .15s; pointer-events: none; }
+.sw i::after { content: ""; position: absolute; top: 3px; left: 3px; width: 24px; height: 24px; border-radius: 50%; background: #fff; transition: transform .15s; }
+.sw input:checked + i { background: var(--focus); }
+.sw input:checked + i::after { transform: translateX(22px); }
+.sw input:focus-visible + i { outline: 3px solid var(--focus); outline-offset: 2px; }
+.btn {
+  border: 2px solid var(--line); background: var(--bg); border-radius: 14px; padding: 12px 16px; font-weight: 800; color: var(--ink);
+}
+.btn.primary { background: var(--focus); border-color: var(--focus); color: #fff; }
+.btn.danger { color: var(--danger); }
+.btns { display: flex; gap: 10px; flex-wrap: wrap; }
+.btns .btn { flex: 1 1 auto; }
+.hues { display: flex; flex-wrap: wrap; gap: 8px; }
+.hue { width: 42px; height: 42px; border-radius: 50%; border: 3px solid transparent; background: oklch(var(--swatch-l) var(--swatch-c) var(--h)); }
+.hue[aria-pressed="true"] { border-color: var(--ink); }
+.hint { font-size: 14px; color: var(--ink-soft); margin: 0; font-weight: 600; }
+.toast {
+  position: fixed; left: 50%; bottom: max(18px, env(safe-area-inset-bottom, 0px)); transform: translate(-50%, 20px);
+  background: var(--ink); color: var(--bg); padding: 12px 20px; border-radius: 999px; font-weight: 800; opacity: 0;
+  pointer-events: none; transition: opacity .2s, transform .2s; z-index: 40; max-width: calc(100% - 32px); text-align: center;
+}
+.toast.on { opacity: 1; transform: translate(-50%, 0); }
+
+.top { flex: none; display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+.board { -webkit-text-size-adjust: 100%; }
+html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+
+/* wide screens held sideways (phones, tablets, laptops): sentence bar and page tabs move to a side column */
+@media (orientation: landscape) and (min-aspect-ratio: 5/4) {
+  .main { flex-direction: row; align-items: stretch; gap: 14px; }
+  .top { width: clamp(168px, 25vw, 260px); overflow-y: auto; scrollbar-width: none; }
+  .top::-webkit-scrollbar { display: none; }
+  .sentence { min-height: 72px; }
+  .stext { white-space: normal; overflow: hidden auto; max-height: 5.2em; font-size: clamp(18px, 2.4vw, 28px); line-height: 1.1; }
+  .tabs { flex-direction: column; overflow: visible; gap: 6px; padding: 0; }
+  .tab { flex: none; width: 100%; text-align: left; min-height: 42px; }
+  .sugg { flex-wrap: wrap; overflow: visible; }
+  .chipbtn { min-height: 36px; padding: 6px 12px; }
+}
+/* short screens (phones held sideways) */
+@media (max-height: 460px) {
+  .hdr { min-height: 48px; padding-block: 4px; gap: 10px; }
+  .logo { width: 42px; height: 28px; }
+  .hbtn { width: 40px; height: 40px; }
+  .hbtn svg { width: 22px; height: 22px; }
+  .main { gap: 8px; padding-block: 8px; }
+  .top { gap: 8px; }
+  .sentence { min-height: 56px; }
+  .say-btn { width: 42px; height: 42px; }
+  .say-btn svg { width: 28px; height: 28px; }
+  .tab { min-height: 36px; padding: 4px 14px; font-size: 15px; }
+  .tabs { gap: 5px; }
+}
+/* phones held upright: dialogs rise from the bottom */
+@media (max-width: 600px) and (orientation: portrait) {
+  .scrim { align-items: flex-end; padding: 0; }
+  .sheet { width: 100%; border-radius: 26px 26px 0 0; max-height: 92%; border-bottom: 0; }
+  .sbody { padding-bottom: max(20px, env(safe-area-inset-bottom, 0px)); }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}
+</style>
+
+<header class="hdr">
+  <svg class="logo" viewBox="0 0 124 80" aria-hidden="true">
+    <path d="M14 4H72Q84 4 84 16V36Q84 48 72 48H40L22 62V48H14Q2 48 2 36V16Q2 4 14 4Z" fill="#fff"/>
+    <circle cx="26" cy="26" r="4" fill="#212e4d"/><circle cx="43" cy="26" r="4" fill="#212e4d"/><circle cx="60" cy="26" r="4" fill="#212e4d"/>
+    <path d="M72 30H108Q120 30 120 42V56Q120 68 108 68H104V78L92 68H72Q60 68 60 56V42Q60 30 72 30Z" fill="#4da6f0" stroke="#212e4d" stroke-width="3"/>
+    <circle cx="82" cy="49" r="3.6" fill="#212e4d"/><circle cx="98" cy="49" r="3.6" fill="#212e4d"/>
+  </svg>
+  <h1 class="title">High-tech <b>AAC</b></h1>
+  <span class="sp"></span>
+  <button class="hbtn" id="btnSettings" aria-label="Settings">
+    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19.4 13a7.6 7.6 0 0 0 0-2l2.1-1.6a.5.5 0 0 0 .1-.6l-2-3.5a.5.5 0 0 0-.6-.2l-2.5 1a7.4 7.4 0 0 0-1.7-1l-.4-2.6a.5.5 0 0 0-.5-.4h-4a.5.5 0 0 0-.5.4l-.4 2.6c-.6.3-1.2.6-1.7 1l-2.5-1a.5.5 0 0 0-.6.2l-2 3.5a.5.5 0 0 0 .1.6L4.6 11a7.6 7.6 0 0 0 0 2l-2.1 1.6a.5.5 0 0 0-.1.6l2 3.5c.1.2.4.3.6.2l2.5-1c.5.4 1.1.7 1.7 1l.4 2.6c0 .2.2.4.5.4h4c.3 0 .5-.2.5-.4l.4-2.6c.6-.3 1.2-.6 1.7-1l2.5 1c.2.1.5 0 .6-.2l2-3.5a.5.5 0 0 0-.1-.6zM12 15.5A3.5 3.5 0 1 1 12 8.5a3.5 3.5 0 0 1 0 7z"/></svg>
+  </button>
+  <button class="hbtn" id="btnFull" aria-label="Full screen">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" id="icoFull"><path d="M4 9V4h5M15 4h5v5M20 15v5h-5M9 20H4v-5"/></svg>
+  </button>
+</header>
+
+<div class="editbar" id="editbar" hidden>
+  <span>Edit mode. Tap a button to change it.</span>
+  <button id="btnDone">Done</button>
+</div>
+
+<main class="main">
+  <div class="top">
+  <div class="sentence" id="sentence">
+    <button class="say-btn" id="btnSpeak" aria-label="Speak the word">
+      <svg viewBox="0 0 48 48" fill="none">
+        <path d="M6 18h8l11-9v30l-11-9H6z" fill="currentColor" stroke="currentColor" stroke-width="3" stroke-linejoin="round"/>
+        <g class="waves" stroke="currentColor" stroke-width="3.5" stroke-linecap="round"><path d="M32 18c3 3.5 3 8.500 0 12"/><path d="M37 12c6 6.500 6 17.500 0 24"/></g>
+      </svg>
+    </button>
+    <button class="stext empty" id="stext" aria-label="Speak the word"><span id="stextInner">Tap a button to speak…</span></button>
+    <button class="sbtn" id="btnBack" aria-label="Remove last word" hidden>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M21 5H9l-6 7 6 7h12z"/><path d="M13 9.5l5 5M18 9.5l-5 5"/></svg>
+    </button>
+    <button class="sbtn" id="btnClear" aria-label="Clear the word" hidden>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+    </button>
+  </div>
+  <div class="sugg" id="sugg" role="group" aria-label="Word suggestions" hidden></div>
+  <nav class="tabs" id="tabs" aria-label="Board pages"></nav>
+  </div>
+  <div class="board" id="board" role="group" aria-label="Communication buttons"></div>
+</main>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<div class="scrim" id="settingsScrim" hidden>
+  <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="setTitle">
+    <div class="shead">
+      <h2 id="setTitle">Settings</h2>
+      <button class="sclose" id="setClose" aria-label="Close settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+    </div>
+    <div class="sbody">
+      <div class="fld">
+        <label for="selVoice">Voice</label>
+        <select id="selVoice"><option value="">Default voice</option></select>
+      </div>
+      <div class="fld">
+        <label for="rngRate">Speed <span class="val" id="vRate"></span></label>
+        <input type="range" id="rngRate" min="0.5" max="1.5" step="0.1">
+      </div>
+      <div class="fld">
+        <label for="rngPitch">Pitch <span class="val" id="vPitch"></span></label>
+        <input type="range" id="rngPitch" min="0.5" max="1.5" step="0.1">
+      </div>
+      <div class="fld">
+        <label for="rngVol">Volume <span class="val" id="vVol"></span></label>
+        <input type="range" id="rngVol" min="0.2" max="1" step="0.1">
+      </div>
+      <button class="btn" id="btnTest">Test the voice</button>
+      <div class="row">
+        <div class="fld"><span class="fl" id="lblSpeakTap">Speak when a button is tapped</span><p class="hint">Turn off to show the word first, then tap the speaker to hear it.</p></div>
+        <span class="sw"><input type="checkbox" id="chkSpeakTap" aria-labelledby="lblSpeakTap"><i></i></span>
+      </div>
+      <div class="fld">
+        <span class="fl" id="lblSize">Button text size</span>
+        <div class="seg" role="radiogroup" aria-labelledby="lblSize">
+          <label><input type="radio" name="size" value="1"><span>Medium</span></label>
+          <label><input type="radio" name="size" value="1.25"><span>Large</span></label>
+          <label><input type="radio" name="size" value="1.5"><span>Extra large</span></label>
+        </div>
+      </div>
+      <div class="row">
+        <div class="fld"><span class="fl" id="lblBuild">Build sentences</span><p class="hint">Turn off to show one word at a time.</p></div>
+        <span class="sw"><input type="checkbox" id="chkBuild" aria-labelledby="lblBuild"><i></i></span>
+      </div>
+      <button class="btn" id="btnClearHist">Clear history</button>
+      <div class="fld">
+        <span class="fl">Places and location</span>
+        <button class="btn" id="btnPlaces">Manage places</button>
+        <div class="row">
+          <div class="fld"><span class="fl" id="lblAuto">Switch places automatically (GPS)</span><p class="hint" id="autoStatus"></p></div>
+          <span class="sw"><input type="checkbox" id="chkAuto" aria-labelledby="lblAuto"><i></i></span>
+        </div>
+      </div>
+      <div class="fld">
+        <span class="fl">Caregiver lock</span>
+        <p class="hint" id="careHint"></p>
+        <div class="btns">
+          <button class="btn primary" id="btnPinSet">Set a PIN</button>
+          <button class="btn primary" id="btnLock">Lock board now</button>
+          <button class="btn" id="btnPinChange">Change PIN</button>
+          <button class="btn danger" id="btnPinRemove">Remove PIN</button>
+        </div>
+      </div>
+      <div class="btns">
+        <button class="btn primary" id="btnEdit">Edit buttons</button>
+        <button class="btn danger" id="btnReset">Reset all buttons</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="scrim" id="editScrim" hidden>
+  <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="edTitle">
+    <div class="shead">
+      <h2 id="edTitle">Edit button</h2>
+      <button class="sclose" id="edClose" aria-label="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+    </div>
+    <div class="sbody">
+      <div class="fld"><label for="edLabel">Label shown on the button</label><input type="text" id="edLabel" maxlength="24" autocomplete="off"></div>
+      <div class="fld"><label for="edSay">What it says out loud</label><input type="text" id="edSay" maxlength="80" autocomplete="off"><p class="hint">Leave empty to say the label.</p></div>
+      <div class="fld"><label for="edSym">Picture (type or paste one emoji)</label><input type="text" id="edSym" maxlength="8" autocomplete="off"><p class="hint">Leave empty to keep the original picture.</p></div>
+      <div class="fld"><span class="fl">Color</span><div class="hues" id="hues"></div></div>
+      <div class="btns">
+        <button class="btn primary" id="edSave">Save</button>
+        <button class="btn" id="edReset">Put back original</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="scrim" id="pinScrim" hidden>
+  <div class="sheet pin" role="dialog" aria-modal="true" aria-labelledby="pinTitle">
+    <div class="shead"><h2 id="pinTitle">Enter PIN</h2></div>
+    <div class="sbody">
+      <p class="hint" id="pinMsg" aria-live="polite"></p>
+      <div class="pindots" id="pinDots" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+      <div class="keypad" id="keypad"></div>
+      <button class="btn" id="pinCancel">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<div class="scrim" id="placesScrim" hidden>
+  <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="plTitle">
+    <div class="shead"><h2 id="plTitle">Places</h2><button class="sclose" id="plClose" aria-label="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+    <div class="sbody">
+      <p class="hint">Each place opens its own set of buttons. Once a place has a GPS spot, the board switches to it by itself when the learner arrives, with no tapping needed. &ldquo;I’m here&rdquo; picks a place by hand.</p>
+      <div class="plist" id="placeList"></div>
+      <div class="fld"><label for="plName">Add a place</label><input type="text" id="plName" maxlength="24" autocomplete="off" placeholder="For example: Grandma’s house"></div>
+      <div class="fld"><label for="plType">Buttons to show there</label>
+        <select id="plType"><option value="home">Home</option><option value="school">School</option><option value="clinic">Clinic</option><option value="other">Out and about</option></select>
+      </div>
+      <button class="btn primary" id="plAdd">Add place</button>
+    </div>
+  </div>
+</div>
+
+<div class="scrim" id="whereScrim" hidden>
+  <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="whTitle">
+    <div class="shead"><h2 id="whTitle">Where are you?</h2><button class="sclose" id="whereClose" aria-label="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+    <div class="sbody">
+      <div class="plist" id="whereList"></div>
+      <button class="btn" id="whereNone">Not at a saved place</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  /* ---------- symbols ---------- */
+  var HAND = '<rect class="o" x="2" y="16" width="22" height="26" rx="6" fill="#f7d3ae"/>' +
+    '<rect class="o" x="0.5" y="-13" width="5.5" height="22" rx="2.7" fill="#f7d3ae"/><rect class="o" x="7" y="-14" width="5.5" height="22" rx="2.7" fill="#f7d3ae"/>' +
+    '<rect class="o" x="13.5" y="-14" width="5.5" height="22" rx="2.7" fill="#f7d3ae"/><rect class="o" x="20" y="-12" width="5.5" height="20" rx="2.7" fill="#f7d3ae"/>' +
+    '<rect class="o" x="0" y="6" width="26" height="18" rx="8" fill="#f7d3ae"/>';
+  var SYM = {
+    yes: '<svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="46" fill="#17a34a"/><path d="M29 52L44 67L73 35" fill="none" stroke="#fff" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+    no: '<svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="46" fill="#dc3d36"/><path d="M33 33L67 67M67 33L33 67" fill="none" stroke="#fff" stroke-width="10" stroke-linecap="round"/></svg>',
+    help: '<svg viewBox="0 0 100 100"><g transform="translate(28.5 49.750) rotate(50)">' + HAND + '</g><g transform="translate(71.5 46.250) rotate(230)">' + HAND + '</g><g stroke="#f5b800" stroke-width="4.500" stroke-linecap="round"><path d="M30 26L36 34"/><path d="M18 38L27 41"/><path d="M43 16L45 26"/></g></svg>',
+    happy: '<svg viewBox="0 0 100 100"><circle class="o" cx="50" cy="50" r="42" fill="#f8c94d"/><path class="o" d="M30 45q7-9 14 0M56 45q7-9 14 0" fill="none"/><path class="o" d="M32 58Q50 82 68 58Z" fill="#8a2233"/><ellipse cx="50" cy="70" rx="8" ry="4.500" fill="#ef6a7a"/></svg>',
+    water: '<svg viewBox="0 0 100 100"><path d="M29 38H71L67 86Q66.500 90 62 90H38Q33.500 90 33 86Z" fill="#4da6f5"/><ellipse cx="50" cy="38" rx="21" ry="3.500" fill="#8fc7fa"/><path class="o" d="M26 12H74L68.500 87Q68 92 62 92H38Q32 92 31.500 87Z" fill="none"/><ellipse class="o" cx="50" cy="12" rx="24" ry="4.500" fill="none"/></svg>',
+    eat: '<svg viewBox="0 0 100 100"><path class="o" d="M20 10V34Q20 44 31 44Q42 44 42 34V10" fill="#8b94b3"/><path class="o" d="M31 10V30" fill="none"/><rect class="o" x="27" y="42" width="8" height="46" rx="4" fill="#8b94b3"/><ellipse class="o" cx="70" cy="27" rx="14" ry="18" fill="#8b94b3"/><rect class="o" x="66" y="42" width="8" height="46" rx="4" fill="#8b94b3"/></svg>',
+    home: '<svg viewBox="0 0 100 100"><rect class="o" x="62" y="20" width="10" height="20" fill="#ef4f4f"/><rect class="o" x="22" y="46" width="52" height="40" fill="#fdf0d5"/><path class="o" d="M12 52L48 20L84 52Z" fill="#ef4f4f"/><rect class="o" x="32" y="60" width="14" height="26" rx="7" fill="#a86a2b"/><rect class="o" x="54" y="58" width="14" height="14" fill="#cfe3ff"/><path class="o" d="M8 88H78" fill="none"/><circle cx="84" cy="81" r="7" fill="#2fa15a"/></svg>',
+    bathroom: '<svg viewBox="0 0 100 100"><rect class="o" x="32" y="8" width="36" height="28" rx="5" fill="#fff"/><path class="o" d="M20 44H80Q80 66 64 72V82L70 90H30L36 82V72Q20 66 20 44Z" fill="#fff"/><path class="o" d="M20 44Q50 52 80 44" fill="none"/></svg>',
+    more: '<svg viewBox="0 0 100 100"><path class="o" d="M8 38H52V18L94 50L52 82V62H8Z" fill="#a66bbd"/></svg>'
+  };
+
+  /* ---------- boards ---------- */
+  var PAGES = {
+    home: { name: "Home", next: "feelings", items: [
+      { id: "yes", label: "Yes", say: "Yes", sym: "yes", hue: 150 },
+      { id: "no", label: "No", say: "No", sym: "no", hue: 12 },
+      { id: "help", label: "Help", say: "Help", sym: "help", hue: 245 },
+      { id: "happy", label: "I’m Happy", say: "I’m happy", sym: "happy", hue: 90 },
+      { id: "water", label: "Water", say: "Water", sym: "water", hue: 300 },
+      { id: "eat", label: "Eat", say: "Eat", sym: "eat", hue: 168 },
+      { id: "home", label: "Home", say: "Home", sym: "home", hue: 268 },
+      { id: "bathroom", label: "Bathroom", say: "Bathroom", sym: "bathroom", hue: 205 }
+    ]},
+    feelings: { name: "Feelings", items: [
+      { id: "happy2", label: "Happy", say: "I’m happy", emoji: "😊", hue: 90 },
+      { id: "sad", label: "Sad", say: "I’m sad", emoji: "😢", hue: 245 },
+      { id: "angry", label: "Angry", say: "I’m angry", emoji: "😠", hue: 12 },
+      { id: "scared", label: "Scared", say: "I’m scared", emoji: "😨", hue: 295 },
+      { id: "tired", label: "Tired", say: "I’m tired", emoji: "😴", hue: 268 },
+      { id: "sick", label: "Sick", say: "I feel sick", emoji: "🤒", hue: 140 },
+      { id: "hurt", label: "Hurt", say: "I’m hurt", emoji: "🤕", hue: 40 },
+      { id: "hot", label: "Hot", say: "I’m hot", emoji: "🥵", hue: 15 },
+      { id: "cold", label: "Cold", say: "I’m cold", emoji: "🥶", hue: 220 }
+    ]},
+    play: { name: "Play", items: [
+      { id: "play", label: "Play", say: "I want to play", emoji: "🎮", hue: 268 },
+      { id: "ball", label: "Ball", say: "Ball", emoji: "⚽", hue: 150 },
+      { id: "toys", label: "Toys", say: "Toys", emoji: "🧸", hue: 40 },
+      { id: "draw", label: "Draw", say: "Draw", emoji: "🎨", hue: 320 },
+      { id: "book", label: "Book", say: "Book", emoji: "📖", hue: 245 },
+      { id: "music", label: "Music", say: "Music", emoji: "🎵", hue: 205 },
+      { id: "tv", label: "TV", say: "TV", emoji: "📺", hue: 295 },
+      { id: "outside", label: "Outside", say: "Go outside", emoji: "🌳", hue: 140 },
+      { id: "dance", label: "Dance", say: "Dance", emoji: "💃", hue: 12 }
+    ]},
+    greetings: { name: "Greetings", items: [
+      { id: "hello", label: "Hello", say: "Hello", emoji: "👋", hue: 90 },
+      { id: "bye", label: "Goodbye", say: "Goodbye", emoji: "👋", hue: 168 },
+      { id: "morning", label: "Good morning", say: "Good morning", emoji: "🌅", hue: 40 },
+      { id: "night", label: "Good night", say: "Good night", emoji: "🌙", hue: 268 },
+      { id: "please", label: "Please", say: "Please", emoji: "🙏", hue: 205 },
+      { id: "thanks", label: "Thank you", say: "Thank you", emoji: "💛", hue: 85 },
+      { id: "sorry", label: "Sorry", say: "I’m sorry", emoji: "😔", hue: 245 },
+      { id: "love", label: "I love you", say: "I love you", emoji: "❤️", hue: 12 },
+      { id: "excuse", label: "Excuse me", say: "Excuse me", emoji: "🙋", hue: 295 }
+    ]},
+    exchange: { name: "Exchange", items: [
+      { id: "want", label: "I want", say: "I want", emoji: "🙋", hue: 168 },
+      { id: "giveme", label: "Give me", say: "Give me", emoji: "🤲", hue: 205 },
+      { id: "myturn", label: "My turn", say: "My turn", emoji: "👈", hue: 90 },
+      { id: "yourturn", label: "Your turn", say: "Your turn", emoji: "👉", hue: 245 },
+      { id: "again", label: "Again", say: "Again", emoji: "🔁", hue: 150 },
+      { id: "more2", label: "More", say: "More", emoji: "➕", hue: 320 },
+      { id: "alldone", label: "All done", say: "All done", emoji: "✅", hue: 140 },
+      { id: "stop", label: "Stop", say: "Stop", emoji: "✋", hue: 12 },
+      { id: "wait", label: "Wait", say: "Wait", emoji: "⏳", hue: 40 }
+    ]}
+  };
+  var CTX = {
+    ctx_home: { name: "At home", items: [
+      { id: "mom", label: "Mom", say: "Mom", emoji: "👩", hue: 12 },
+      { id: "dad", label: "Dad", say: "Dad", emoji: "👨", hue: 245 },
+      { id: "bedroom", label: "Bedroom", say: "Bedroom", emoji: "🛏️", hue: 295 },
+      { id: "kitchen", label: "Kitchen", say: "Kitchen", emoji: "🍳", hue: 40 },
+      { id: "bath", label: "Bath", say: "I want a bath", emoji: "🛁", hue: 205 },
+      { id: "snack", label: "Snack", say: "I want a snack", emoji: "🍪", hue: 85 },
+      { id: "tv", label: "TV", say: "TV", emoji: "📺", hue: 268 },
+      { id: "pet", label: "Pet", say: "My pet", emoji: "🐶", hue: 150 },
+      { id: "sleep", label: "Sleep", say: "I want to sleep", emoji: "😴", hue: 320 }
+    ]},
+    ctx_school: { name: "School", items: [
+      { id: "teacher", label: "Teacher", say: "Teacher", emoji: "🍎", hue: 12 },
+      { id: "friend", label: "Friend", say: "Friend", emoji: "🤝", hue: 90 },
+      { id: "restroom", label: "Bathroom", say: "I need the bathroom", emoji: "🚽", hue: 205 },
+      { id: "lunch", label: "Lunch", say: "I’m hungry for lunch", emoji: "🍱", hue: 40 },
+      { id: "recess", label: "Recess", say: "Recess", emoji: "🛝", hue: 150 },
+      { id: "book", label: "Book", say: "Book", emoji: "📚", hue: 245 },
+      { id: "pencil", label: "Pencil", say: "Pencil", emoji: "✏️", hue: 85 },
+      { id: "finished", label: "Finished", say: "I’m finished", emoji: "✅", hue: 140 },
+      { id: "needhelp", label: "Help me", say: "I need help", emoji: "🆘", hue: 15 }
+    ]},
+    ctx_clinic: { name: "Clinic", items: [
+      { id: "doctor", label: "Doctor", say: "Doctor", emoji: "🩺", hue: 205 },
+      { id: "nurse", label: "Nurse", say: "Nurse", emoji: "💉", hue: 168 },
+      { id: "medicine", label: "Medicine", say: "Medicine", emoji: "💊", hue: 320 },
+      { id: "hurtshere", label: "Hurts here", say: "It hurts here", emoji: "🤕", hue: 15 },
+      { id: "scared2", label: "Scared", say: "I’m scared", emoji: "😨", hue: 295 },
+      { id: "drink", label: "Water", say: "I want water", emoji: "🥤", hue: 245 },
+      { id: "restroom2", label: "Bathroom", say: "I need the bathroom", emoji: "🚽", hue: 205 },
+      { id: "howlong", label: "How long?", say: "How long do I wait?", emoji: "⏳", hue: 85 },
+      { id: "gohome", label: "Go home", say: "I want to go home", emoji: "🏠", hue: 268 }
+    ]},
+    ctx_other: { name: "Out and about", items: [
+      { id: "car", label: "Car", say: "Car", emoji: "🚗", hue: 245 },
+      { id: "bus", label: "Bus", say: "Bus", emoji: "🚌", hue: 85 },
+      { id: "store", label: "Store", say: "Store", emoji: "🛒", hue: 168 },
+      { id: "park", label: "Park", say: "Park", emoji: "🌳", hue: 140 },
+      { id: "eatout", label: "Eat out", say: "I want to eat out", emoji: "🍔", hue: 40 },
+      { id: "restroom3", label: "Bathroom", say: "I need the bathroom", emoji: "🚽", hue: 205 },
+      { id: "loud", label: "Too loud", say: "It’s too loud", emoji: "🙉", hue: 295 },
+      { id: "bright", label: "Too bright", say: "It’s too bright", emoji: "☀️", hue: 90 },
+      { id: "gohome2", label: "Go home", say: "I want to go home", emoji: "🏠", hue: 268 }
+    ]}
+  };
+  Object.keys(CTX).forEach(function (k) { PAGES[k] = CTX[k]; });
+  var TYPES = { home: "Home", school: "School", clinic: "Clinic", other: "Out and about" };
+  function getPage(id) { return PAGES[id] || PAGES.home; }
+  function curPlace() {
+    for (var i = 0; i < state.places.length; i++) if (state.places[i].id === state.place) return state.places[i];
+    return null;
+  }
+  function ctxKey() { var p = curPlace(); return p ? "ctx_" + (CTX["ctx_" + p.type] ? p.type : "other") : null; }
+  var HUES = [12, 40, 85, 140, 168, 205, 245, 268, 295, 320];
+
+  /* ---------- state ---------- */
+  var KEY = "midtech-aac-v1";
+  var state = {
+    page: "home", sentence: [], edit: false, editing: null, hue: 150,
+    s: { voiceURI: "", rate: 1, pitch: 1, volume: 1, speakTap: true, size: "1", build: true },
+    custom: {}, hist: [], pin: null, locked: false, auto: true, place: null, placeAuto: false, typed: "",
+    places: [
+      { id: "p_home", name: "Home", type: "home", radius: 100 },
+      { id: "p_school", name: "School", type: "school", radius: 100 },
+      { id: "p_clinic", name: "Clinic", type: "clinic", radius: 150 }
+    ]
+  };
+  try {
+    var saved = JSON.parse(localStorage.getItem(KEY) || "null");
+    if (saved) {
+      if (saved.s) Object.keys(saved.s).forEach(function (k) { state.s[k] = saved.s[k]; });
+      if (saved.custom) state.custom = saved.custom;
+      if (saved.pin && saved.pin.hash) { state.pin = saved.pin; state.locked = !!saved.locked; }
+      if (Array.isArray(saved.places)) state.places = saved.places;
+      state.place = saved.place || null; state.placeAuto = !!saved.placeAuto; state.auto = saved.autoOff !== true;
+      if (Array.isArray(saved.hist)) state.hist = saved.hist.filter(function (e) { return e && e.text && Array.isArray(e.w); });
+    }
+  } catch (e) {}
+  function persist() {
+    try {
+      localStorage.setItem(KEY, JSON.stringify({ s: state.s, custom: state.custom, pin: state.pin, locked: state.locked, places: state.places, place: state.place, placeAuto: state.placeAuto, autoOff: !state.auto, hist: state.hist }));
+    } catch (e) {}
+  }
+
+  var $ = function (id) { return document.getElementById(id); };
+  var synth = ("speechSynthesis" in window) ? window.speechSynthesis : null;
+  var voices = [];
+
+  /* ---------- toast ---------- */
+  var toastTimer;
+  function toast(msg) {
+    var t = $("toast"); t.textContent = msg; t.classList.add("on");
+    clearTimeout(toastTimer); toastTimer = setTimeout(function () { t.classList.remove("on"); }, 2600);
+  }
+
+  /* ---------- speech ---------- */
+  function speak(text) {
+    if (!text) return;
+    if (!synth) { toast("This browser can't speak out loud."); return; }
+    try {
+      synth.cancel();
+      var u = new SpeechSynthesisUtterance(text);
+      u.rate = +state.s.rate; u.pitch = +state.s.pitch; u.volume = +state.s.volume;
+      if (state.s.voiceURI) {
+        for (var i = 0; i < voices.length; i++) if (voices[i].voiceURI === state.s.voiceURI) { u.voice = voices[i]; u.lang = voices[i].lang; break; }
+      }
+      u.onstart = function () { $("sentence").classList.add("speaking"); };
+      u.onend = u.onerror = function () { $("sentence").classList.remove("speaking"); };
+      synth.speak(u);
+    } catch (e) { toast("Speech did not start. Try again."); }
+  }
+  function stopSpeech() { try { if (synth) synth.cancel(); } catch (e) {} $("sentence").classList.remove("speaking"); }
+
+  function loadVoices() {
+    if (!synth) return;
+    voices = synth.getVoices() || [];
+    var sel = $("selVoice"), lang = (navigator.language || "en").slice(0, 2).toLowerCase();
+    var sorted = voices.slice().sort(function (a, b) {
+      var am = a.lang.toLowerCase().indexOf(lang) === 0 ? 0 : 1, bm = b.lang.toLowerCase().indexOf(lang) === 0 ? 0 : 1;
+      return am - bm || a.name.localeCompare(b.name);
+    });
+    sel.innerHTML = "";
+    var d = document.createElement("option"); d.value = ""; d.textContent = "Default voice"; sel.appendChild(d);
+    sorted.forEach(function (v) {
+      var o = document.createElement("option"); o.value = v.voiceURI; o.textContent = v.name + " (" + v.lang + ")"; sel.appendChild(o);
+    });
+    sel.value = state.s.voiceURI || "";
+    if (sel.value !== (state.s.voiceURI || "")) sel.value = "";
+  }
+  if (synth) { loadVoices(); try { synth.addEventListener("voiceschanged", loadVoices); } catch (e) { synth.onvoiceschanged = loadVoices; } }
+
+  /* ---------- sentence bar ---------- */
+  function renderBar() {
+    var typed = state.typed, has = state.sentence.length > 0 || typed.length > 0, st = $("stext");
+    var t = state.sentence.join(" ");
+    if (typed) t += (t ? " " : "") + typed + "|";
+    $("stextInner").textContent = has ? t : (state.page === "type" ? "Type a message…" : "Tap a button to speak…");
+    st.classList.toggle("empty", !has);
+    $("btnBack").hidden = !(has && (state.s.build || typed));
+    $("btnClear").hidden = !has;
+    st.scrollLeft = (state.s.build || typed) ? st.scrollWidth : 0;
+    renderSugg();
+  }
+  function commitTyped() {
+    if (!state.typed) return;
+    var w = state.typed; state.typed = "";
+    if (state.s.build) state.sentence.push(w); else state.sentence = [w];
+  }
+  function speakSentence() {
+    commitTyped(); renderBar();
+    if (!state.sentence.length) { toast("Nothing to say yet. Tap a button first."); return; }
+    speak(state.sentence.join(" ")); recordHist(state.sentence);
+  }
+  function typeKey(ch) { if (state.typed.length < 24) { state.typed += ch; renderBar(); } }
+  function typeSpace() { if (state.typed) { commitTyped(); renderBar(); } }
+  function typeBack() {
+    if (state.typed) state.typed = state.typed.slice(0, -1);
+    else if (state.sentence.length) state.sentence.pop();
+    renderBar();
+  }
+  function renderKeyboard(board) {
+    function key(label, cls, fn, aria) {
+      var b = document.createElement("button"); b.type = "button"; b.className = "kkey" + (cls ? " " + cls : "");
+      if (label.charAt(0) === "<") b.innerHTML = label; else b.textContent = label;
+      b.setAttribute("aria-label", aria || label);
+      b.addEventListener("mousedown", function (e) { e.preventDefault(); });
+      b.addEventListener("click", function () { fn(); b.blur(); });
+      return b;
+    }
+    ["qwertyuiop", "asdfghjkl", "zxcvbnm"].forEach(function (rowStr, ri) {
+      var row = document.createElement("div"); row.className = "krow" + (ri === 1 ? " r2" : "");
+      rowStr.split("").forEach(function (ch) { row.appendChild(key(ch, "", function () { typeKey(ch); }, ch)); });
+      if (ri === 2) row.appendChild(key('<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M21 5H9l-6 7 6 7h12z"/><path d="M13 9.5l5 5M18 9.5l-5 5"/></svg>', "wide", typeBack, "Delete"));
+      board.appendChild(row);
+    });
+    var last = document.createElement("div"); last.className = "krow";
+    last.appendChild(key("'", "", function () { typeKey("'"); }, "Apostrophe"));
+    last.appendChild(key("space", "space", typeSpace, "Space, add the word"));
+    last.appendChild(key('<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M3 9v6h4l5 4V5L7 9z"/><path d="M15 8.5a5 5 0 0 1 0 7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg><span>Speak</span>', "speak", speakSentence, "Speak"));
+    board.appendChild(last);
+  }
+  function dialogOpen() {
+    return ["settingsScrim", "editScrim", "pinScrim", "placesScrim", "whereScrim"].some(function (id) { return !$(id).hidden; });
+  }
+  document.addEventListener("keydown", function (e) {
+    if (state.page !== "type" || dialogOpen() || e.ctrlKey || e.metaKey || e.altKey) return;
+    var tg = e.target && e.target.tagName;
+    if (tg === "INPUT" || tg === "SELECT" || tg === "TEXTAREA") return;
+    if (/^[a-zA-Z']$/.test(e.key)) { e.preventDefault(); typeKey(e.key.toLowerCase()); }
+    else if (e.key === " ") { e.preventDefault(); typeSpace(); }
+    else if (e.key === "Enter") { e.preventDefault(); speakSentence(); }
+    else if (e.key === "Backspace") { e.preventDefault(); typeBack(); }
+  });
+  function addWord(text) {
+    if (state.s.build) state.sentence.push(text); else state.sentence = [text];
+    renderBar();
+    if (state.s.speakTap) { speak(text); if (!state.s.build) recordHist([text]); }
+  }
+
+  /* ---------- word suggestions (rule based, works offline) ---------- */
+  var DEFAULT_START = ["Yes", "No", "Help", "Please", "I want", "Hello"];
+  var STARTERS = {
+    home: ["Mom", "Dad", "I want a snack", "TV"],
+    school: ["Teacher", "I need help", "I need the bathroom", "I’m finished"],
+    clinic: ["It hurts here", "I want water", "I’m scared", "How long do I wait?"],
+    other: ["I want to go home", "It’s too loud", "I need the bathroom"]
+  };
+  var NEXT = {
+    "i want": ["Water", "Eat", "Play", "Music", "Please", "Home"],
+    "i want to play": ["Ball", "Toys", "Music", "Please", "Go outside"],
+    "eat": ["Please", "Water", "More", "Again", "All done"],
+    "water": ["Please", "More", "Thank you", "All done", "Again"],
+    "please": ["Help", "Water", "Eat", "More", "Again", "Play"],
+    "help": ["Please", "Stop", "Bathroom", "Home", "Doctor"],
+    "i need help": ["Please", "Teacher", "Mom", "Dad", "Stop"],
+    "stop": ["Please", "Wait", "No", "All done"],
+    "wait": ["Please", "Stop", "Again", "Your turn"],
+    "more": ["Please", "Water", "Eat", "Play", "Music"],
+    "again": ["Please", "More", "Play", "My turn"],
+    "yes": ["Please", "Thank you", "More", "Again", "Eat", "Water"],
+    "no": ["Stop", "Thank you", "Help", "Wait", "All done"],
+    "hello": ["I’m happy", "Help", "Please", "I want", "Good morning"],
+    "goodbye": ["I love you", "Thank you", "Mom", "Dad"],
+    "thank you": ["Goodbye", "I love you", "More", "All done"],
+    "sorry": ["I love you", "Please", "Thank you"],
+    "i love you": ["Thank you", "Goodbye", "Mom", "Dad"],
+    "good morning": ["Mom", "Dad", "Teacher", "I’m happy", "Eat"],
+    "good night": ["I love you", "Mom", "Dad", "Sleep"],
+    "i'm happy": ["Play", "Music", "Thank you", "I love you", "More"],
+    "i'm sad": ["Help", "Mom", "Dad", "Please", "I want to go home"],
+    "i'm angry": ["Stop", "Help", "Wait", "Please"],
+    "i'm scared": ["Help", "Mom", "Dad", "Stop", "I want to go home"],
+    "i'm tired": ["Sleep", "Home", "Please", "All done"],
+    "i feel sick": ["Help", "Doctor", "Home", "Water", "Medicine"],
+    "i'm hurt": ["Help", "Doctor", "It hurts here", "Mom", "Dad"],
+    "i'm hot": ["Water", "Please", "Help"],
+    "i'm cold": ["Please", "Help", "Home"],
+    "it hurts here": ["Help", "Doctor", "Medicine", "Please"],
+    "my turn": ["Please", "Again", "Wait", "Thank you"],
+    "your turn": ["Please", "Thank you", "Again", "Wait"],
+    "all done": ["Thank you", "Home", "Please", "Again", "Goodbye"],
+    "give me": ["Water", "Eat", "Toys", "Book", "Please"],
+    "mom": ["Help", "I love you", "Please", "I want"],
+    "dad": ["Help", "I love you", "Please", "I want"],
+    "teacher": ["Help", "Please", "I need help", "I’m finished"],
+    "play": ["Ball", "Toys", "Music", "Please", "Again"],
+    "music": ["Please", "Again", "More", "Stop"],
+    "bathroom": ["Please", "Help", "Wait", "Thank you"],
+    "home": ["Please", "Mom", "Dad", "Thank you"],
+    "i want a snack": ["Please", "More", "Thank you"],
+    "i need the bathroom": ["Please", "Help", "Wait"],
+    "default": ["Please", "Thank you", "More", "Again", "Stop", "All done"]
+  };
+  function norm(t) { return String(t).toLowerCase().replace(/’/g, "'"); }
+  function lastWord(t) { var p = norm(t).split(/\s+/); return p[p.length - 1]; }
+  function learned(prev) {
+    var m = {}, key = norm(prev);
+    state.hist.forEach(function (e) {
+      for (var i = 0; i < e.w.length - 1; i++) if (norm(e.w[i]) === key) m[e.w[i + 1]] = (m[e.w[i + 1]] || 0) + (e.c || 1);
+    });
+    return Object.keys(m).sort(function (a, b) { return m[b] - m[a]; }).slice(0, 3);
+  }
+  function suggestions() {
+    var out = [], s0 = state.sentence, last = s0.length ? s0[s0.length - 1] : "", pl = curPlace();
+    function add(list) {
+      (list || []).forEach(function (w) { if (out.length < 6 && out.indexOf(w) < 0 && norm(w) !== norm(last)) out.push(w); });
+    }
+    if (!s0.length) {
+      add(pl && STARTERS[pl.type]);
+      add(state.hist.slice(0, 2).map(function (e) { return e.text; }));
+      add(DEFAULT_START);
+    } else {
+      add(learned(last));
+      add(NEXT[norm(last)] || NEXT[lastWord(last)]);
+      add(NEXT["default"]);
+    }
+    return out;
+  }
+  var COMMON = "a an the and or but to of in on at for with from by about as it its this that these those here there what where when who why how can could will would should do does did don't doesn't not is are am was were be been have has had i me my mine we us our you your he him his she her they them their yes no ok okay please thank thanks sorry hello hi bye goodbye good bad big little small more less again all some any every now later today tomorrow yesterday up down in out over under off open close stop go come wait look see hear say tell ask give take get put make eat drink sleep play read write draw sing dance walk run sit stand help hurt happy sad mad angry scared tired hungry thirsty hot cold sick mom dad friend teacher doctor nurse home school bathroom toilet water food snack juice milk rice bread breakfast lunch dinner love like want need feel think know understand turn music book toy ball game phone tv outside inside car bus store park";
+  var LEX = null;
+  function lexicon() {
+    if (LEX) return LEX;
+    var m = {};
+    function add(t) {
+      String(t).toLowerCase().replace(/’/g, "'").split(/[^a-z']+/).forEach(function (w) { if (w.length > 1 || w === "i" || w === "a") m[w] = 1; });
+    }
+    Object.keys(PAGES).forEach(function (k) { PAGES[k].items.forEach(function (it) { add(it.label); add(it.say); }); });
+    add(COMMON); LEX = Object.keys(m); return LEX;
+  }
+  function complete(prefix) {
+    var freq = {}, pool = lexicon().slice();
+    state.hist.forEach(function (e) {
+      e.w.forEach(function (x) { String(x).toLowerCase().replace(/’/g, "'").split(/[^a-z']+/).forEach(function (w) { if (w) { freq[w] = (freq[w] || 0) + (e.c || 1); if (pool.indexOf(w) < 0) pool.push(w); } }); });
+    });
+    return pool.filter(function (w) { return w.indexOf(prefix) === 0 && w !== prefix; })
+      .sort(function (a, b) { return (freq[b] || 0) - (freq[a] || 0) || a.length - b.length || (a < b ? -1 : 1); }).slice(0, 6);
+  }
+  function pickCompletion(w) {
+    state.typed = ""; if (state.s.build) state.sentence.push(w); else state.sentence = [w]; renderBar();
+  }
+  function renderSugg() {
+    var box = $("sugg"); box.innerHTML = "";
+    var typing = state.page === "type" && state.typed.length > 0;
+    if (!state.s.build && !typing) { box.hidden = true; return; }
+    var list = typing ? complete(state.typed) : suggestions(); box.hidden = !list.length;
+    list.forEach(function (w) {
+      var b = document.createElement("button"); b.type = "button"; b.className = "chipbtn"; b.textContent = w;
+      b.addEventListener("click", function () { if (typing) pickCompletion(w); else addWord(w); });
+      box.appendChild(b);
+    });
+  }
+
+  /* ---------- history ---------- */
+  function recordHist(words) {
+    if (!words.length) return;
+    var text = words.join(" "), h = state.hist, i;
+    for (i = 0; i < h.length; i++) if (h[i].text === text) break;
+    var c = i < h.length ? (h[i].c || 1) + 1 : 1;
+    if (i < h.length) h.splice(i, 1);
+    h.unshift({ text: text, w: words.slice(), t: Date.now(), c: c });
+    if (h.length > 60) h.length = 60;
+    persist();
+    if (state.page === "history") renderBoard(false);
+  }
+  function renderHistory(board) {
+    var list = state.hist.slice(0, 9);
+    if (!list.length) {
+      var e = document.createElement("div"); e.className = "histempty";
+      e.innerHTML = "<strong>Nothing spoken yet</strong><span>Messages you speak show up here, so you can say them again with one tap.</span>";
+      board.appendChild(e); return;
+    }
+    list.forEach(function (en, i) {
+      var b = document.createElement("button"); b.type = "button"; b.className = "tile hist nav"; b.style.setProperty("--h", HUES[i % HUES.length]);
+      var sym = document.createElement("div"); sym.className = "sym";
+      var em = document.createElement("span"); em.className = "emoji"; em.textContent = "💬"; sym.appendChild(em);
+      var lb = document.createElement("div"); lb.className = "lbl"; lb.textContent = en.text;
+      b.appendChild(sym); b.appendChild(lb); b.setAttribute("aria-label", "Say again: " + en.text);
+      b.addEventListener("click", function () {
+        if (state.locked) ensureFull();
+        state.sentence = state.s.build ? en.w.slice() : [en.text];
+        renderBar(); pulse(b); speak(en.text);
+      });
+      board.appendChild(b);
+    });
+  }
+
+  /* ---------- board ---------- */
+  function eff(pageId, item) {
+    var c = state.custom[pageId + ":" + item.id], o = {};
+    Object.keys(item).forEach(function (k) { o[k] = item[k]; });
+    if (c) {
+      if (c.label) o.label = c.label;
+      if (c.say) o.say = c.say;
+      if (typeof c.hue === "number") o.hue = c.hue;
+      if (c.emoji) { o.emoji = c.emoji; o.sym = null; }
+    }
+    return o;
+  }
+  function pulse(el) { el.classList.remove("hit"); void el.offsetWidth; el.classList.add("hit"); }
+
+  function renderBoard(animate) {
+    if (state.page.indexOf("ctx_") === 0 && ctxKey() !== state.page) state.page = "home";
+    var page = getPage(state.page), board = $("board");
+    board.innerHTML = "";
+    board.classList.toggle("edit", state.edit);
+    board.style.setProperty("--label-scale", state.s.size);
+    function addTile(o, nav) {
+      var b = document.createElement("button");
+      b.type = "button"; b.className = "tile" + (nav ? " nav" : ""); b.style.setProperty("--h", o.hue);
+      var sym = document.createElement("div"); sym.className = "sym" + (o.flip ? " flip" : "");
+      if (o.sym) sym.innerHTML = SYM[o.sym];
+      else { var em = document.createElement("span"); em.className = "emoji"; em.textContent = o.emoji || ""; sym.appendChild(em); }
+      var lb = document.createElement("div"); lb.className = "lbl"; lb.textContent = o.label;
+      b.appendChild(sym); b.appendChild(lb);
+      b.setAttribute("aria-label", nav ? o.label : (state.edit ? "Edit " + o.label : o.label));
+      b.addEventListener("click", function () { onTile(o, b, nav); });
+      board.appendChild(b);
+    }
+    board.classList.toggle("kbmode", state.page === "type");
+    if (state.page === "history") renderHistory(board);
+    else if (state.page === "type") renderKeyboard(board);
+    else page.items.forEach(function (it) { var o = eff(state.page, it); o.pageId = state.page; addTile(o, false); });
+    if (state.page === "home") addTile({ label: "More", sym: "more", hue: 320, go: page.next }, true);
+    renderTabs();
+    if (animate) { board.classList.remove("swap"); void board.offsetWidth; board.classList.add("swap"); }
+  }
+
+  var PIN_SVG = '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a7 7 0 0 0-7 7c0 5 7 13 7 13s7-8 7-13a7 7 0 0 0-7-7zm0 9.5A2.5 2.5 0 1 1 12 6.500a2.500 2.500 0 0 1 0 5z"/></svg>';
+  function renderTabs() {
+    var box = $("tabs"); box.innerHTML = "";
+    var pl = curPlace();
+    var chip = document.createElement("button");
+    chip.type = "button"; chip.className = "tab place"; chip.innerHTML = PIN_SVG;
+    var sp = document.createElement("span"); sp.textContent = pl ? pl.name : "Set place"; chip.appendChild(sp);
+    chip.setAttribute("aria-label", "Place: " + (pl ? pl.name : "not set") + (state.locked ? "" : ". Tap to change"));
+    if (state.locked) chip.disabled = true; else chip.addEventListener("click", openWhere);
+    box.appendChild(chip);
+    var tabs = [["home", "Home"]];
+    if (pl) tabs.push([ctxKey(), "Here"]);
+    tabs.push(["feelings", "Feelings"], ["play", "Play"], ["greetings", "Greetings"], ["exchange", "Exchange"], ["type", "Type"], ["history", "History"]);
+    tabs.forEach(function (t) {
+      var b = document.createElement("button");
+      b.type = "button"; b.className = "tab"; b.textContent = t[1];
+      var on = state.page === t[0];
+      b.setAttribute("aria-pressed", on ? "true" : "false");
+      if (on) b.setAttribute("aria-current", "page");
+      b.addEventListener("click", function () { if (state.page !== t[0]) go(t[0]); });
+      box.appendChild(b);
+    });
+    var a = box.querySelector("[aria-current]");
+    if (a && a.scrollIntoView) { try { a.scrollIntoView({ block: "nearest", inline: "nearest" }); } catch (e) {} }
+  }
+
+  function onTile(o, el, nav) {
+    if (state.locked) ensureFull();
+    if (nav) { go(o.go); return; }
+    if (state.edit) { openEditor(o); return; }
+    addWord(o.say); pulse(el);
+  }
+  function go(id) {
+    state.page = id;
+    try { if (document.activeElement && document.activeElement.blur) document.activeElement.blur(); } catch (e) {}
+    renderBoard(true); renderBar();
+  }
+
+  /* ---------- edit mode ---------- */
+  function setEdit(on) {
+    state.edit = on; $("editbar").hidden = !on; renderBoard(false);
+  }
+  var lastFocus = null;
+  function openScrim(id, focusId) {
+    lastFocus = document.activeElement; $(id).hidden = false;
+    var f = $(focusId); if (f) f.focus();
+  }
+  function closeScrim(id) {
+    $(id).hidden = true;
+    if (lastFocus && lastFocus.focus) { try { lastFocus.focus(); } catch (e) {} }
+  }
+  function buildHues() {
+    var box = $("hues"); box.innerHTML = "";
+    HUES.forEach(function (h) {
+      var b = document.createElement("button");
+      b.type = "button"; b.className = "hue"; b.style.setProperty("--h", h); b.setAttribute("aria-label", "Color " + h);
+      b.setAttribute("aria-pressed", state.hue === h ? "true" : "false");
+      b.addEventListener("click", function () {
+        state.hue = h;
+        Array.prototype.forEach.call(box.children, function (c) { c.setAttribute("aria-pressed", "false"); });
+        b.setAttribute("aria-pressed", "true");
+      });
+      box.appendChild(b);
+    });
+  }
+  function openEditor(o) {
+    state.editing = o.pageId + ":" + o.id;
+    var c = state.custom[state.editing] || {};
+    $("edLabel").value = o.label; $("edSay").value = o.say;
+    $("edSym").value = c.emoji || (o.sym ? "" : (o.emoji || ""));
+    state.hue = o.hue; buildHues();
+    openScrim("editScrim", "edLabel");
+  }
+  function saveEditor() {
+    var label = $("edLabel").value.trim();
+    if (!label) { toast("Give the button a label."); $("edLabel").focus(); return; }
+    var say = $("edSay").value.trim() || label, emoji = $("edSym").value.trim();
+    state.custom[state.editing] = { label: label, say: say, hue: state.hue, emoji: emoji };
+    persist(); closeScrim("editScrim"); renderBoard(false); toast("Saved");
+  }
+  function resetTile() {
+    delete state.custom[state.editing]; persist(); closeScrim("editScrim"); renderBoard(false); toast("Original button restored");
+  }
+
+  /* ---------- settings ---------- */
+  function syncSettings() {
+    $("rngRate").value = state.s.rate; $("rngPitch").value = state.s.pitch; $("rngVol").value = state.s.volume;
+    $("vRate").textContent = (+state.s.rate).toFixed(1) + "x"; $("vPitch").textContent = (+state.s.pitch).toFixed(1);
+    $("vVol").textContent = Math.round(state.s.volume * 100) + "%";
+    $("chkSpeakTap").checked = !!state.s.speakTap;
+    $("chkBuild").checked = !!state.s.build;
+    Array.prototype.forEach.call(document.getElementsByName("size"), function (r) { r.checked = r.value === String(state.s.size); });
+    $("selVoice").value = state.s.voiceURI || "";
+    if (!synth) { $("selVoice").disabled = true; }
+    syncCare();
+  }
+  var resetArmed = false, resetTimer;
+  function bindSettings() {
+    $("btnSettings").addEventListener("click", function () {
+      if (state.locked) { openPin("verify", "Unlock the board", unlock); return; }
+      syncSettings(); openScrim("settingsScrim", "setClose");
+    });
+    $("setClose").addEventListener("click", function () { closeScrim("settingsScrim"); });
+    $("selVoice").addEventListener("change", function (e) { state.s.voiceURI = e.target.value; persist(); });
+    [["rngRate", "rate"], ["rngPitch", "pitch"], ["rngVol", "volume"]].forEach(function (p) {
+      $(p[0]).addEventListener("input", function (e) { state.s[p[1]] = +e.target.value; persist(); syncSettings(); });
+    });
+    $("btnTest").addEventListener("click", function () { speak("Hello, this is how I sound."); });
+    $("chkSpeakTap").addEventListener("change", function (e) { state.s.speakTap = e.target.checked; persist(); });
+    $("chkBuild").addEventListener("change", function (e) {
+      state.s.build = e.target.checked;
+      if (!state.s.build && state.sentence.length > 1) state.sentence = [state.sentence[state.sentence.length - 1]];
+      persist(); renderBar();
+    });
+    $("btnClearHist").addEventListener("click", function () {
+      var b = $("btnClearHist");
+      if (b.dataset.arm !== "1") {
+        b.dataset.arm = "1"; b.textContent = "Tap again to clear";
+        setTimeout(function () { b.dataset.arm = ""; b.textContent = "Clear history"; }, 3500); return;
+      }
+      b.dataset.arm = ""; b.textContent = "Clear history"; state.hist = []; persist(); renderBoard(false); renderBar(); toast("History cleared");
+    });
+    Array.prototype.forEach.call(document.getElementsByName("size"), function (r) {
+      r.addEventListener("change", function () { state.s.size = r.value; persist(); $("board").style.setProperty("--label-scale", r.value); });
+    });
+    $("btnEdit").addEventListener("click", function () { closeScrim("settingsScrim"); lastFocus = null; setEdit(true); });
+    $("btnReset").addEventListener("click", function () {
+      var b = $("btnReset");
+      if (!resetArmed) {
+        resetArmed = true; b.textContent = "Tap again to confirm";
+        resetTimer = setTimeout(function () { resetArmed = false; b.textContent = "Reset all buttons"; }, 3500);
+        return;
+      }
+      clearTimeout(resetTimer); resetArmed = false; b.textContent = "Reset all buttons";
+      state.custom = {}; persist(); renderBoard(false); toast("All buttons restored");
+    });
+    $("btnDone").addEventListener("click", function () { setEdit(false); });
+    $("edSave").addEventListener("click", saveEditor);
+    $("edReset").addEventListener("click", resetTile);
+    $("edClose").addEventListener("click", function () { closeScrim("editScrim"); });
+    ["settingsScrim", "editScrim", "placesScrim", "whereScrim"].forEach(function (id) {
+      $(id).addEventListener("click", function (e) { if (e.target === $(id)) closeScrim(id); });
+    });
+    ["edLabel", "edSay", "edSym"].forEach(function (id) {
+      $(id).addEventListener("keydown", function (e) { if (e.key === "Enter") saveEditor(); });
+    });
+    document.addEventListener("keydown", function (e) {
+      if (e.key !== "Escape") return;
+      if (!$("pinScrim").hidden) closePin();
+      else if (!$("editScrim").hidden) closeScrim("editScrim");
+      else if (!$("whereScrim").hidden) closeScrim("whereScrim");
+      else if (!$("placesScrim").hidden) closeScrim("placesScrim");
+      else if (!$("settingsScrim").hidden) closeScrim("settingsScrim");
+    });
+  }
+
+  /* ---------- places and location ---------- */
+  function mk(label, fn) {
+    var b = document.createElement("button"); b.type = "button"; b.className = "btn"; b.textContent = label;
+    b.addEventListener("click", fn); return b;
+  }
+  function setPlace(id, auto) {
+    state.place = id; state.placeAuto = !!(auto && id); persist();
+    var p = curPlace();
+    if (p) {
+      if (!(auto && state.page === "type")) state.page = ctxKey();
+      toast((auto ? "You’re at " : "Place set to ") + p.name);
+    } else if (state.page.indexOf("ctx_") === 0) state.page = "home";
+    renderBoard(true); renderSugg();
+  }
+  function openWhere() {
+    var box = $("whereList"); box.innerHTML = "";
+    if (!state.places.length) {
+      var e = document.createElement("p"); e.className = "hint"; e.textContent = "No places yet. A caregiver can add them in Settings."; box.appendChild(e);
+    }
+    state.places.forEach(function (pl) {
+      var b = mk(pl.name + "  (" + TYPES[pl.type] + ")", function () { closeScrim("whereScrim"); setPlace(pl.id, false); });
+      b.setAttribute("aria-pressed", pl.id === state.place ? "true" : "false"); box.appendChild(b);
+    });
+    openScrim("whereScrim", "whereClose");
+  }
+  function geoMsg(e) {
+    return e && e.code === 1 ? "Location is blocked or turned off for this page." : "Couldn’t get a location fix.";
+  }
+  function getPos(ok, fail) {
+    if (!navigator.geolocation) { fail({ code: 0 }); return; }
+    try { navigator.geolocation.getCurrentPosition(ok, fail, { enableHighAccuracy: true, timeout: 12000, maximumAge: 15000 }); }
+    catch (e) { fail({ code: 0 }); }
+  }
+  function dist(a, b, c, d) {
+    var R = 6371000, r = Math.PI / 180, dLa = (c - a) * r, dLo = (d - b) * r;
+    var h = Math.sin(dLa / 2) * Math.sin(dLa / 2) + Math.cos(a * r) * Math.cos(c * r) * Math.sin(dLo / 2) * Math.sin(dLo / 2);
+    return 2 * R * Math.asin(Math.min(1, Math.sqrt(h)));
+  }
+  var watchId = null;
+  function setAuto(msg) { $("autoStatus").textContent = msg; }
+  function stopWatch() {
+    try { if (watchId !== null && navigator.geolocation) navigator.geolocation.clearWatch(watchId); } catch (e) {}
+    watchId = null;
+  }
+  function hasSpots() { return state.places.some(function (pl) { return typeof pl.lat === "number"; }); }
+  function onGeo(pos) {
+    var la = pos.coords.latitude, lo = pos.coords.longitude, acc = pos.coords.accuracy || 0, best = null, bd = 1e12;
+    state.places.forEach(function (pl) {
+      if (typeof pl.lat !== "number") return;
+      var d = dist(la, lo, pl.lat, pl.lng), lim = (pl.radius || 100) + Math.min(acc, 50);
+      if (pl.id === state.place) lim *= 1.25;
+      if (d <= lim && d < bd) { best = pl; bd = d; }
+    });
+    if (best) {
+      setAuto("At " + best.name + ". Switched automatically.");
+      if (best.id !== state.place) setPlace(best.id, true);
+    } else {
+      setAuto("Watching. Not near a saved place.");
+      if (state.place && state.placeAuto) setPlace(null, true);
+    }
+  }
+  function startWatch() {
+    stopWatch();
+    if (!navigator.geolocation) { setAuto("Location isn’t available in this view. Pick your place by hand."); return; }
+    setAuto("Looking for your location…");
+    try {
+      watchId = navigator.geolocation.watchPosition(onGeo, function (e) {
+        if (e && e.code === 3) { setAuto("Waiting for a location fix…"); return; }
+        stopWatch(); setAuto(geoMsg(e) + " Pick your place by hand.");
+      }, { enableHighAccuracy: true, maximumAge: 10000, timeout: 30000 });
+    } catch (e) { setAuto("Location isn’t available in this view. Pick your place by hand."); }
+  }
+  function refreshWatch() {
+    if (!state.auto) { stopWatch(); setAuto("Automatic switching is off."); return; }
+    if (!hasSpots()) { stopWatch(); setAuto("Save a GPS spot for a place and the board will switch by itself."); return; }
+    if (watchId === null) startWatch();
+  }
+  function renderPlaces() {
+    var box = $("placeList"); box.innerHTML = "";
+    if (!state.places.length) {
+      var e = document.createElement("p"); e.className = "hint"; e.textContent = "No places yet. Add one below."; box.appendChild(e);
+    }
+    state.places.forEach(function (pl) {
+      var row = document.createElement("div"); row.className = "prow";
+      var h = document.createElement("div"); h.className = "pn"; h.textContent = pl.name + "  ·  " + TYPES[pl.type];
+      var c = document.createElement("small");
+      c.textContent = typeof pl.lat === "number" ? pl.lat.toFixed(5) + ", " + pl.lng.toFixed(5) : "No GPS spot saved yet";
+      var act = document.createElement("div"); act.className = "btns";
+      act.appendChild(mk("I’m here", function () { setPlace(pl.id, false); closeScrim("placesScrim"); }));
+      act.appendChild(mk("Save my GPS spot", function () {
+        getPos(function (pos) {
+          pl.lat = pos.coords.latitude; pl.lng = pos.coords.longitude; persist(); renderPlaces(); toast("GPS spot saved for " + pl.name);
+          stopWatch(); refreshWatch();
+        }, function (er) { toast(geoMsg(er)); });
+      }));
+      var sel = document.createElement("select"); sel.setAttribute("aria-label", "Detection radius for " + pl.name);
+      [50, 100, 200, 500].forEach(function (r) {
+        var o = document.createElement("option"); o.value = r; o.textContent = r + " m"; sel.appendChild(o);
+      });
+      sel.value = String(pl.radius || 100); if (sel.value !== String(pl.radius || 100)) sel.value = "100";
+      sel.addEventListener("change", function () { pl.radius = +sel.value; persist(); stopWatch(); refreshWatch(); });
+      act.appendChild(sel);
+      var del = mk("Delete", function () {
+        if (del.dataset.arm !== "1") {
+          del.dataset.arm = "1"; del.textContent = "Tap again to delete";
+          setTimeout(function () { del.dataset.arm = ""; del.textContent = "Delete"; }, 3000); return;
+        }
+        state.places = state.places.filter(function (x) { return x.id !== pl.id; });
+        if (state.place === pl.id) state.place = null;
+        persist(); renderPlaces(); renderBoard(true); stopWatch(); refreshWatch();
+      });
+      del.classList.add("danger"); act.appendChild(del);
+      row.appendChild(h); row.appendChild(c); row.appendChild(act); box.appendChild(row);
+    });
+  }
+
+  /* ---------- caregiver PIN lock ---------- */
+  var GEAR_HTML = "";
+  var LOCK_HTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9" rx="2.5" fill="currentColor"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>';
+  function ensureFull() {
+    try {
+      if (document.fullscreenEnabled && !document.fullscreenElement) {
+        var p = document.documentElement.requestFullscreen(); if (p && p.catch) p.catch(function () {});
+      }
+    } catch (e) {}
+  }
+  function applyLock() {
+    var b = $("btnSettings");
+    if (!GEAR_HTML) GEAR_HTML = b.innerHTML;
+    b.innerHTML = state.locked ? LOCK_HTML : GEAR_HTML;
+    b.setAttribute("aria-label", state.locked ? "Unlock the board" : "Settings");
+    $("btnFull").hidden = state.locked || !document.fullscreenEnabled;
+    try {
+      window.onbeforeunload = state.locked ? function (e) { e.preventDefault(); e.returnValue = ""; return ""; } : null;
+    } catch (e) {}
+    renderTabs();
+  }
+  function unlock() { state.locked = false; persist(); applyLock(); toast("Unlocked"); }
+  function lockNow() {
+    if (!state.pin) return;
+    if (state.edit) setEdit(false);
+    state.locked = true; persist(); closeScrim("settingsScrim"); applyLock(); ensureFull(); toast("Board locked");
+  }
+  function syncCare() {
+    var has = !!state.pin;
+    $("btnPinSet").hidden = has; $("btnLock").hidden = !has; $("btnPinChange").hidden = !has; $("btnPinRemove").hidden = !has;
+    $("careHint").textContent = has
+      ? "Locking hides settings and editing. It stays locked if this page is closed and opened again, until the PIN is entered. A web page can’t stop the browser or phone from closing, so for a full lockdown also turn on Guided Access (iPhone, iPad) or Screen pinning (Android)."
+      : "Set a 4-digit PIN so only a caregiver can open settings and edit buttons.";
+    $("chkAuto").checked = !!state.auto;
+    if (!$("autoStatus").textContent) setAuto("Asks for location permission. Not every view allows it.");
+  }
+
+  function newSalt() {
+    var a = new Uint8Array(8);
+    try { crypto.getRandomValues(a); } catch (e) { for (var i = 0; i < 8; i++) a[i] = Math.random() * 256 | 0; }
+    return Array.prototype.map.call(a, function (x) { return ("0" + x.toString(16)).slice(-2); }).join("");
+  }
+  function hashPin(pin, salt) {
+    var data = salt + ":" + pin;
+    if (window.crypto && crypto.subtle && window.TextEncoder) {
+      return crypto.subtle.digest("SHA-256", new TextEncoder().encode(data)).then(function (b) {
+        return Array.prototype.map.call(new Uint8Array(b), function (x) { return ("0" + x.toString(16)).slice(-2); }).join("");
+      });
+    }
+    var h = 5381; for (var i = 0; i < data.length; i++) h = ((h << 5) + h + data.charCodeAt(i)) | 0;
+    return Promise.resolve("d" + (h >>> 0).toString(16));
+  }
+  var pinS = { mode: "verify", buf: "", first: "", done: null, fails: 0, title: "", timer: null };
+  function paintDots() {
+    Array.prototype.forEach.call($("pinDots").children, function (d, i) { d.classList.toggle("on", i < pinS.buf.length); });
+  }
+  function shake() { var d = $("pinDots"); d.classList.remove("shake"); void d.offsetWidth; d.classList.add("shake"); }
+  function openPin(mode, title, done) {
+    pinS.mode = mode; pinS.title = title; pinS.done = done; pinS.buf = ""; pinS.first = "";
+    $("pinTitle").textContent = title;
+    $("pinMsg").textContent = mode === "set" ? "Choose a 4-digit PIN." : "Enter the 4-digit PIN.";
+    $("keypad").classList.remove("off"); paintDots();
+    openScrim("pinScrim", "pinCancel");
+  }
+  function closePin() {
+    clearInterval(pinS.timer); pinS.timer = null; pinS.buf = ""; closeScrim("pinScrim");
+  }
+  function pinKey(d) {
+    if ($("keypad").classList.contains("off") || pinS.buf.length >= 4) return;
+    pinS.buf += d; paintDots();
+    if (pinS.buf.length === 4) setTimeout(pinDone, 120);
+  }
+  function pinBack() { pinS.buf = pinS.buf.slice(0, -1); paintDots(); }
+  function pinDone() {
+    var v = pinS.buf;
+    if (pinS.mode === "set") {
+      pinS.first = v; pinS.mode = "confirm"; pinS.buf = "";
+      $("pinTitle").textContent = "Confirm your PIN"; $("pinMsg").textContent = "Enter it once more."; paintDots(); return;
+    }
+    if (pinS.mode === "confirm") {
+      if (v !== pinS.first) {
+        pinS.mode = "set"; pinS.buf = ""; pinS.first = "";
+        $("pinTitle").textContent = pinS.title; $("pinMsg").textContent = "Those didn’t match. Try again."; shake(); paintDots(); return;
+      }
+      var salt = newSalt();
+      hashPin(v, salt).then(function (h) {
+        state.pin = { salt: salt, hash: h }; persist();
+        var d = pinS.done; closePin(); syncCare(); if (d) d();
+      });
+      return;
+    }
+    hashPin(v, state.pin.salt).then(function (h) {
+      if (h === state.pin.hash) { pinS.fails = 0; var d = pinS.done; closePin(); if (d) d(); return; }
+      pinS.fails++; pinS.buf = ""; paintDots(); shake();
+      if (pinS.fails >= 5) {
+        var left = 30; $("keypad").classList.add("off");
+        $("pinMsg").textContent = "Too many tries. Wait " + left + " seconds.";
+        pinS.timer = setInterval(function () {
+          left--;
+          if (left <= 0) {
+            clearInterval(pinS.timer); pinS.timer = null; pinS.fails = 0;
+            $("keypad").classList.remove("off"); $("pinMsg").textContent = "Enter the 4-digit PIN.";
+          } else $("pinMsg").textContent = "Too many tries. Wait " + left + " seconds.";
+        }, 1000);
+      } else $("pinMsg").textContent = "That PIN is wrong. " + (5 - pinS.fails) + " tries left.";
+    });
+  }
+  function bindCare() {
+    var pad = $("keypad");
+    [1, 2, 3, 4, 5, 6, 7, 8, 9, "", 0, "back"].forEach(function (k) {
+      if (k === "") { pad.appendChild(document.createElement("div")); return; }
+      var b = document.createElement("button"); b.type = "button"; b.className = "key";
+      if (k === "back") {
+        b.setAttribute("aria-label", "Delete last digit");
+        b.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M21 5H9l-6 7 6 7h12z"/><path d="M13 9.5l5 5M18 9.5l-5 5"/></svg>';
+        b.addEventListener("click", pinBack);
+      } else {
+        b.textContent = String(k); b.setAttribute("aria-label", String(k));
+        b.addEventListener("click", function () { pinKey(String(k)); });
+      }
+      pad.appendChild(b);
+    });
+    document.addEventListener("keydown", function (e) {
+      if ($("pinScrim").hidden) return;
+      if (/^[0-9]$/.test(e.key)) pinKey(e.key);
+      else if (e.key === "Backspace") pinBack();
+    });
+    $("pinCancel").addEventListener("click", closePin);
+    $("pinScrim").addEventListener("click", function (e) { if (e.target === $("pinScrim")) closePin(); });
+
+    $("btnPinSet").addEventListener("click", function () {
+      closeScrim("settingsScrim"); openPin("set", "Set a PIN", function () { toast("PIN saved"); });
+    });
+    $("btnLock").addEventListener("click", lockNow);
+    $("btnPinChange").addEventListener("click", function () {
+      closeScrim("settingsScrim");
+      openPin("verify", "Enter your current PIN", function () { openPin("set", "Choose a new PIN", function () { toast("PIN changed"); }); });
+    });
+    $("btnPinRemove").addEventListener("click", function () {
+      closeScrim("settingsScrim");
+      openPin("verify", "Enter your PIN to remove it", function () {
+        state.pin = null; state.locked = false; persist(); applyLock(); syncCare(); toast("PIN removed");
+      });
+    });
+
+    $("btnPlaces").addEventListener("click", function () { closeScrim("settingsScrim"); renderPlaces(); openScrim("placesScrim", "plClose"); });
+    $("plClose").addEventListener("click", function () { closeScrim("placesScrim"); });
+    $("whereClose").addEventListener("click", function () { closeScrim("whereScrim"); });
+    $("whereNone").addEventListener("click", function () { closeScrim("whereScrim"); setPlace(null, false); });
+    $("plAdd").addEventListener("click", function () {
+      var name = $("plName").value.trim();
+      if (!name) { toast("Give the place a name."); $("plName").focus(); return; }
+      state.places.push({ id: "p_" + Date.now().toString(36), name: name, type: $("plType").value, radius: 100 });
+      $("plName").value = ""; persist(); renderPlaces(); toast("Added " + name);
+    });
+    $("plName").addEventListener("keydown", function (e) { if (e.key === "Enter") $("plAdd").click(); });
+    $("chkAuto").addEventListener("change", function (e) {
+      state.auto = e.target.checked; persist(); stopWatch(); refreshWatch();
+    });
+  }
+
+  /* ---------- fullscreen + wake lock ---------- */
+  var FULL_OUT = "M4 9V4h5M15 4h5v5M20 15v5h-5M9 20H4v-5", FULL_IN = "M9 4v5H4M15 4v5h5M20 15h-5v5M4 15h5v5";
+  function bindFull() {
+    var btn = $("btnFull");
+    if (!document.fullscreenEnabled) { btn.hidden = true; return; }
+    btn.addEventListener("click", function () {
+      try {
+        var p = document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen();
+        if (p && p.catch) p.catch(function () { toast("Full screen isn't available here."); });
+      } catch (e) { toast("Full screen isn't available here."); }
+    });
+    document.addEventListener("fullscreenchange", function () {
+      $("icoFull").firstElementChild.setAttribute("d", document.fullscreenElement ? FULL_IN : FULL_OUT);
+    });
+  }
+  var wl = null;
+  function keepAwake() {
+    try {
+      if ("wakeLock" in navigator && document.visibilityState === "visible" && !wl) {
+        navigator.wakeLock.request("screen").then(function (l) { wl = l; l.addEventListener("release", function () { wl = null; }); }).catch(function () {});
+      }
+    } catch (e) {}
+  }
+  document.addEventListener("visibilitychange", keepAwake);
+  document.addEventListener("pointerdown", keepAwake, { once: true });
+
+  /* ---------- wire up ---------- */
+  $("btnSpeak").addEventListener("click", speakSentence);
+  $("stext").addEventListener("click", speakSentence);
+  $("btnBack").addEventListener("click", function () { typeBack(); stopSpeech(); });
+  $("btnClear").addEventListener("click", function () { state.sentence = []; state.typed = ""; renderBar(); stopSpeech(); });
+  bindSettings(); bindFull(); bindCare();
+  syncSettings(); renderBar(); renderBoard(false); applyLock();
+  refreshWatch();
+})();
+</script>
+
+</body></html>
