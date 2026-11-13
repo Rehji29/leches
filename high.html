@@ -1,11 +1,14 @@
-<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
-<title>High-tech AAC</title>
-<meta name="claude:viewport-fit-sides" content="cover">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&display=swap">
+<!doctype html>
+<html>
+  <head>
+    <meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+      <title>High-tech AAC</title>
+      <meta name="claude:viewport-fit-sides" content="cover">
+      <link rel="preconnect" href="https://fonts.googleapis.com">
+      <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+      <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&display=swap">
 <style>
-/* Layout: one-screen board. Navy title bar, sentence bar, then a 3x3 grid of large pastel tiles that fills the rest. */
+
 :root {
   --bg: #f4f7fc;
   --surface: #ffffff;
@@ -42,6 +45,7 @@
   color-scheme: dark;
 }
 
+[hidden] { display: none !important; }
 * { box-sizing: border-box; }
 html, body { height: 100%; }
 body {
@@ -57,7 +61,6 @@ body::before {
 button { font: inherit; color: inherit; cursor: pointer; }
 :focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
 
-/* header */
 .hdr {
   flex: none; background: var(--bar-bg); color: var(--bar-ink);
   padding-block: 10px;
@@ -81,7 +84,6 @@ button { font: inherit; color: inherit; cursor: pointer; }
 .hbtn svg { width: 24px; height: 24px; }
 .hdr :focus-visible { outline-color: #fff; }
 
-/* edit banner */
 .editbar {
   flex: none; display: flex; align-items: center; gap: 12px; background: var(--accent); color: #0d1b33;
   padding-block: 8px; font-weight: 800;
@@ -91,7 +93,6 @@ button { font: inherit; color: inherit; cursor: pointer; }
 .editbar span { flex: 1; min-width: 0; }
 .editbar button { border: 0; background: #0d1b33; color: #fff; border-radius: 999px; padding: 8px 18px; font-weight: 800; }
 
-/* main */
 .main {
   flex: 1; min-height: 0; display: flex; flex-direction: column; gap: 12px; padding-block: 12px;
   padding-left: max(14px, env(safe-area-inset-left, 0px));
@@ -195,7 +196,41 @@ button { font: inherit; color: inherit; cursor: pointer; }
 .kkey.space { flex: 5 1 0; text-transform: none; font-weight: 700; color: var(--ink-soft); }
 .kkey.speak { flex: 2.4 1 0; background: var(--focus); border-color: var(--focus); color: #fff; text-transform: none; }
 
-/* board */
+.tabs {
+  flex: none; display: flex; gap: 4px; overflow: visible; padding: 5px; order: 4;
+  background: var(--surface); border: 2px solid var(--line); border-radius: 24px;
+}
+.tab {
+  flex: 1 1 0; min-width: 0; min-height: 58px; padding: 6px 2px; border-radius: 18px; border: 0; background: transparent;
+  color: var(--ink-soft); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px;
+  font-weight: 800; font-size: clamp(11.5px, 3.1vw, 15px); line-height: 1.1; white-space: nowrap;
+}
+.tab svg { width: 24px; height: 24px; flex: none; }
+.tab .em { font-size: 22px; line-height: 24px; height: 24px; font-family: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif; }
+.tab span:not(.em) { max-width: 100%; overflow: hidden; text-overflow: ellipsis; }
+.tab[aria-pressed="true"] { background: var(--ink); color: var(--bg); }
+.tab:disabled { opacity: .6; }
+.sentence { order: 1; } .sugg { order: 2; } .board { order: 3; }
+
+.hbtn.lang { width: auto; min-width: 46px; padding: 0 12px; border-radius: 23px; font-weight: 800; font-size: 14px; letter-spacing: .04em; }
+.sbtn.ai { background: var(--focus); color: #fff; }
+.sheet.topics { width: min(460px, 100%); }
+.tgrid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.tcard {
+  --h: 150; min-height: 104px; border-radius: 20px; padding: 12px 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px;
+  background: oklch(var(--tile-l) var(--tile-c) var(--h)); border: 2px solid oklch(var(--tile-bl) var(--tile-bc) var(--h));
+  color: var(--ink); font-weight: 800; font-size: 18px;
+}
+.tcard:active { transform: scale(.97); }
+.tcard[aria-pressed="true"] { outline: 3px solid var(--focus); outline-offset: 1px; }
+.tcard .em { font-size: 38px; line-height: 1; font-family: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif; }
+.aiopt {
+  width: 100%; text-align: left; padding: 16px; border-radius: 18px; border: 2px solid var(--sug-line);
+  background: var(--sug); color: var(--ink); font-weight: 800; font-size: 20px; line-height: 1.25;
+}
+.aiopt:active { transform: scale(.98); }
+.aiload { text-align: center; color: var(--ink-soft); font-weight: 800; padding: 16px 0; }
+
 .board {
   flex: 1; min-height: 0; display: grid; gap: clamp(8px, 1.6vw, 14px);
   grid-template-columns: repeat(3, minmax(0, 1fr)); grid-template-rows: repeat(3, minmax(0, 1fr));
@@ -219,7 +254,7 @@ button { font: inherit; color: inherit; cursor: pointer; }
 .sym .emoji { font-size: min(72cqh, 46cqw); line-height: 1; font-family: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif; }
 .lbl {
   font-weight: 800; text-align: center; line-height: 1.1; max-width: 100%; overflow-wrap: anywhere;
-  font-size: clamp(13px, min(calc(12cqw * var(--label-scale)), 16cqw, calc(16cqh * var(--label-scale))), 44px);
+  font-size: clamp(14px, min(calc(15cqw * var(--label-scale)), 19cqw, calc(18cqh * var(--label-scale))), 46px);
 }
 .flip svg { transform: scaleX(-1); }
 .edit .tile:not(.nav) { outline: 3px dashed var(--focus); outline-offset: -7px; }
@@ -229,7 +264,7 @@ button { font: inherit; color: inherit; cursor: pointer; }
 }
 .o { stroke: var(--ink); stroke-width: 3; stroke-linejoin: round; stroke-linecap: round; }
 
-/* dialogs */
+
 .scrim {
   position: fixed; inset: 0; z-index: 30; background: var(--scrim); display: flex; align-items: center; justify-content: center;
   padding-block: max(16px, env(safe-area-inset-top, 0px));
@@ -291,7 +326,6 @@ input[type="range"] { width: 100%; accent-color: var(--focus); height: 32px; }
 .board { -webkit-text-size-adjust: 100%; }
 html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
 
-/* wide screens held sideways (phones, tablets, laptops): sentence bar and page tabs move to a side column */
 @media (orientation: landscape) and (min-aspect-ratio: 5/4) {
   .main { flex-direction: row; align-items: stretch; gap: 14px; }
   .top { width: clamp(168px, 25vw, 260px); overflow-y: auto; scrollbar-width: none; }
@@ -303,7 +337,7 @@ html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
   .sugg { flex-wrap: wrap; overflow: visible; }
   .chipbtn { min-height: 36px; padding: 6px 12px; }
 }
-/* short screens (phones held sideways) */
+
 @media (max-height: 460px) {
   .hdr { min-height: 48px; padding-block: 4px; gap: 10px; }
   .logo { width: 42px; height: 28px; }
@@ -317,7 +351,7 @@ html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
   .tab { min-height: 36px; padding: 4px 14px; font-size: 15px; }
   .tabs { gap: 5px; }
 }
-/* phones held upright: dialogs rise from the bottom */
+
 @media (max-width: 600px) and (orientation: portrait) {
   .scrim { align-items: flex-end; padding: 0; }
   .sheet { width: 100%; border-radius: 26px 26px 0 0; max-height: 92%; border-bottom: 0; }
@@ -325,6 +359,27 @@ html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
 }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; }
+}
+.top { display: contents; }
+@media (orientation: landscape) and (min-aspect-ratio: 5/4) {
+  .top { display: flex; }
+  .tabs { order: 4; flex-direction: column; gap: 4px; padding: 5px; }
+  .tab { flex: none; width: 100%; flex-direction: row; justify-content: flex-start; gap: 12px; min-height: 46px; padding: 6px 12px; font-size: 16px; }
+  .tab .em { width: 24px; text-align: center; }
+}
+@media (orientation: landscape) and (min-aspect-ratio: 5/4) {
+  .sentence { flex-wrap: wrap; gap: 2px 6px; padding: 6px; }
+  .stext { order: 0; flex: 1 1 100%; min-height: 44px; }
+  .say-btn { order: 1; margin-right: auto; }
+  .sbtn { order: 2; }
+  .sugg { flex-wrap: nowrap; overflow-x: auto; overflow-y: hidden; }
+}
+@media (orientation: landscape) and (min-aspect-ratio: 5/4) and (max-height: 460px) {
+  .say-btn, .sbtn { width: 40px; height: 40px; }
+  .tabs { display: grid; grid-template-columns: 1fr 1fr; gap: 3px; padding: 3px; }
+  .tab { flex-direction: column; justify-content: center; gap: 2px; min-height: 46px; padding: 3px 2px; font-size: 12.5px; text-align: center; width: auto; }
+  .tab svg { width: 20px; height: 20px; }
+  .tab .em { font-size: 18px; line-height: 20px; height: 20px; width: auto; }
 }
 </style>
 
@@ -337,6 +392,7 @@ html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
   </svg>
   <h1 class="title">High-tech <b>AAC</b></h1>
   <span class="sp"></span>
+  <button class="hbtn lang" id="btnLang" aria-label="Change language">EN</button>
   <button class="hbtn" id="btnSettings" aria-label="Settings">
     <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19.4 13a7.6 7.6 0 0 0 0-2l2.1-1.6a.5.5 0 0 0 .1-.6l-2-3.5a.5.5 0 0 0-.6-.2l-2.5 1a7.4 7.4 0 0 0-1.7-1l-.4-2.6a.5.5 0 0 0-.5-.4h-4a.5.5 0 0 0-.5.4l-.4 2.6c-.6.3-1.2.6-1.7 1l-2.5-1a.5.5 0 0 0-.6.2l-2 3.5a.5.5 0 0 0 .1.6L4.6 11a7.6 7.6 0 0 0 0 2l-2.1 1.6a.5.5 0 0 0-.1.6l2 3.5c.1.2.4.3.6.2l2.5-1c.5.4 1.1.7 1.7 1l.4 2.6c0 .2.2.4.5.4h4c.3 0 .5-.2.5-.4l.4-2.6c.6-.3 1.2-.6 1.7-1l2.5 1c.2.1.5 0 .6-.2l2-3.5a.5.5 0 0 0-.1-.6zM12 15.5A3.5 3.5 0 1 1 12 8.5a3.5 3.5 0 0 1 0 7z"/></svg>
   </button>
@@ -360,6 +416,9 @@ html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
       </svg>
     </button>
     <button class="stext empty" id="stext" aria-label="Speak the word"><span id="stextInner">Tap a button to speak…</span></button>
+    <button class="sbtn ai" id="btnAI" aria-label="Say it better with Claude" hidden>
+      <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M11 2l2 6 6 2-6 2-2 6-2-6-6-2 6-2z"/><path d="M19 14l1 2.7 2.7 1-2.7 1-1 2.700-1-2.700-2.700-1 2.700-1z"/></svg>
+    </button>
     <button class="sbtn" id="btnBack" aria-label="Remove last word" hidden>
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M21 5H9l-6 7 6 7h12z"/><path d="M13 9.5l5 5M18 9.5l-5 5"/></svg>
     </button>
@@ -382,6 +441,15 @@ html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
       <button class="sclose" id="setClose" aria-label="Close settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
     </div>
     <div class="sbody">
+      <div class="fld">
+        <span class="fl" id="lblLang">Language</span>
+        <div class="seg" role="radiogroup" aria-labelledby="lblLang">
+          <label><input type="radio" name="lang" value="en"><span>English</span></label>
+          <label><input type="radio" name="lang" value="fil"><span>Filipino</span></label>
+          <label><input type="radio" name="lang" value="tag"><span>Taglish</span></label>
+        </div>
+        <p class="hint" id="langHint"></p>
+      </div>
       <div class="fld">
         <label for="selVoice">Voice</label>
         <select id="selVoice"><option value="">Default voice</option></select>
@@ -498,11 +566,34 @@ html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
   </div>
 </div>
 
+<div class="scrim" id="topicsScrim" hidden>
+  <div class="sheet topics" role="dialog" aria-modal="true" aria-labelledby="tpTitle">
+    <div class="shead"><h2 id="tpTitle">Topics</h2><button class="sclose" id="topicsClose" aria-label="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+    <div class="sbody">
+      <div class="tgrid" id="topicGrid"></div>
+      <button class="btn" id="topicsWhere"></button>
+    </div>
+  </div>
+</div>
+
+<div class="scrim" id="aiScrim" hidden>
+  <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="aiTitle">
+    <div class="shead"><h2 id="aiTitle">Say it better</h2><button class="sclose" id="aiClose" aria-label="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+    <div class="sbody">
+      <p class="hint" id="aiWords"></p>
+      <div class="aiload" id="aiLoad" role="status" aria-live="polite" hidden>Thinking&hellip;</div>
+      <div class="plist" id="aiOpts"></div>
+      <p class="hint" id="aiErr" role="alert" hidden></p>
+      <div class="btns"><button class="btn" id="aiOwn">Speak my words</button><button class="btn" id="aiRetry" hidden>Try again</button></div>
+      <p class="hint">Your words, the place and the time of day are sent to Claude to write these options.</p>
+    </div>
+  </div>
+</div>
+
 <script>
 (function () {
   "use strict";
 
-  /* ---------- symbols ---------- */
   var HAND = '<rect class="o" x="2" y="16" width="22" height="26" rx="6" fill="#f7d3ae"/>' +
     '<rect class="o" x="0.5" y="-13" width="5.5" height="22" rx="2.7" fill="#f7d3ae"/><rect class="o" x="7" y="-14" width="5.5" height="22" rx="2.7" fill="#f7d3ae"/>' +
     '<rect class="o" x="13.5" y="-14" width="5.5" height="22" rx="2.7" fill="#f7d3ae"/><rect class="o" x="20" y="-12" width="5.5" height="20" rx="2.7" fill="#f7d3ae"/>' +
@@ -623,6 +714,188 @@ html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
     ]}
   };
   Object.keys(CTX).forEach(function (k) { PAGES[k] = CTX[k]; });
+
+  /* time-of-day routine boards */
+  var RT = {
+    rt_morning: { name: "Morning", items: [
+      { id: "wake", label: "Wake up", say: "I’m awake", emoji: "☀️", hue: 40 },
+      { id: "teeth", label: "Brush teeth", say: "I want to brush my teeth", emoji: "🦷", hue: 205 },
+      { id: "face", label: "Wash face", say: "I want to wash my face", emoji: "🧼", hue: 168 },
+      { id: "dress", label: "Get dressed", say: "I want to get dressed", emoji: "👕", hue: 245 },
+      { id: "breakfast", label: "Breakfast", say: "I want breakfast", emoji: "🥣", hue: 85 },
+      { id: "meds", label: "Medicine", say: "It’s time for my medicine", emoji: "💊", hue: 320 },
+      { id: "toilet", label: "Bathroom", say: "I need the bathroom", emoji: "🚽", hue: 205 },
+      { id: "school", label: "School", say: "I’m ready for school", emoji: "🎒", hue: 150 },
+      { id: "hug", label: "Hug", say: "I want a hug", emoji: "🤗", hue: 12 }
+    ]},
+    rt_lunch: { name: "Lunch", items: [
+      { id: "hungry", label: "Hungry", say: "I’m hungry", emoji: "🍽️", hue: 40 },
+      { id: "rice", label: "Rice", say: "Rice, please", emoji: "🍚", hue: 85 },
+      { id: "meat", label: "Meat", say: "Meat, please", emoji: "🍗", hue: 12 },
+      { id: "veg", label: "Vegetables", say: "Vegetables, please", emoji: "🥦", hue: 140 },
+      { id: "fruit", label: "Fruit", say: "Fruit, please", emoji: "🍎", hue: 15 },
+      { id: "juice", label: "Juice", say: "Juice, please", emoji: "🧃", hue: 295 },
+      { id: "dessert", label: "Dessert", say: "Dessert, please", emoji: "🍰", hue: 320 },
+      { id: "hands", label: "Wash hands", say: "I need to wash my hands", emoji: "🧼", hue: 168 },
+      { id: "full", label: "Full", say: "I’m full", emoji: "😋", hue: 90 }
+    ]},
+    rt_afternoon: { name: "Afternoon", items: [
+      { id: "snack", label: "Snack", say: "I want a snack", emoji: "🍪", hue: 40 },
+      { id: "homework", label: "Homework", say: "I have homework", emoji: "📝", hue: 245 },
+      { id: "outside", label: "Outside", say: "Go outside", emoji: "🌳", hue: 140 },
+      { id: "draw", label: "Draw", say: "Draw", emoji: "🎨", hue: 320 },
+      { id: "story", label: "Story", say: "Read me a story", emoji: "📖", hue: 268 },
+      { id: "cartoons", label: "Cartoons", say: "I want to watch cartoons", emoji: "📺", hue: 205 },
+      { id: "friends", label: "Friends", say: "I want to play with friends", emoji: "🤝", hue: 90 },
+      { id: "rest", label: "Rest", say: "I want to rest", emoji: "🛋️", hue: 295 },
+      { id: "phone", label: "Phone", say: "I want the phone", emoji: "📱", hue: 245 }
+    ]},
+    rt_dinner: { name: "Dinner", items: [
+      { id: "dinner", label: "Dinner", say: "I’m ready for dinner", emoji: "🍽️", hue: 40 },
+      { id: "soup", label: "Soup", say: "Soup, please", emoji: "🍲", hue: 15 },
+      { id: "fish", label: "Fish", say: "Fish, please", emoji: "🐟", hue: 205 },
+      { id: "rice", label: "Rice", say: "Rice, please", emoji: "🍚", hue: 85 },
+      { id: "veg", label: "Vegetables", say: "Vegetables, please", emoji: "🥦", hue: 140 },
+      { id: "water", label: "Water", say: "Water", emoji: "💧", hue: 245 },
+      { id: "dessert", label: "Dessert", say: "Dessert, please", emoji: "🍰", hue: 320 },
+      { id: "together", label: "Together", say: "Let’s eat together", emoji: "👨‍👩‍👧", hue: 12 },
+      { id: "yummy", label: "Yummy", say: "This is yummy", emoji: "😋", hue: 90 }
+    ]},
+    rt_bed: { name: "Bedtime", items: [
+      { id: "bath", label: "Bath", say: "I want a bath", emoji: "🛁", hue: 205 },
+      { id: "pj", label: "Pajamas", say: "I want my pajamas", emoji: "👚", hue: 320 },
+      { id: "teeth", label: "Brush teeth", say: "I want to brush my teeth", emoji: "🦷", hue: 168 },
+      { id: "meds", label: "Medicine", say: "It’s time for my medicine", emoji: "💊", hue: 15 },
+      { id: "story", label: "Story", say: "Read me a story", emoji: "📖", hue: 268 },
+      { id: "light", label: "Light off", say: "Turn off the light", emoji: "💡", hue: 85 },
+      { id: "blanket", label: "Blanket", say: "I want my blanket", emoji: "🛏️", hue: 295 },
+      { id: "hug", label: "Hug", say: "I want a hug", emoji: "🤗", hue: 12 },
+      { id: "night", label: "Good night", say: "Good night", emoji: "🌙", hue: 245 }
+    ]}
+  };
+  Object.keys(RT).forEach(function (k) { PAGES[k] = RT[k]; });
+  var SLOTS = [["rt_morning", "morning"], ["rt_lunch", "lunch"], ["rt_afternoon", "afternoon"], ["rt_dinner", "dinner"], ["rt_bed", "bed"]];
+  function slotNow() {
+    var h = new Date().getHours();
+    return h >= 5 && h < 11 ? 0 : h >= 11 && h < 14 ? 1 : h >= 14 && h < 18 ? 2 : h >= 18 && h < 21 ? 3 : 4;
+  }
+  function slotKey() { return SLOTS[slotNow()][0]; }
+  function slotName() { return SLOTS[slotNow()][1]; }
+  var TIME_START = {
+    morning: ["Good morning", "I want breakfast", "I want to brush my teeth"],
+    lunch: ["I’m hungry", "Rice, please", "I need to wash my hands"],
+    afternoon: ["I want a snack", "I want to rest", "I want to watch cartoons"],
+    dinner: ["I’m ready for dinner", "This is yummy", "Let’s eat together"],
+    bed: ["Good night", "I want a hug", "I want my blanket", "I love you"]
+  };
+
+  var TR = {
+    "yes": ["Oo", "Yes"], "no": ["Hindi", "No"], "help": ["Tulong", "Help po"],
+    "i'm happy": ["Masaya ako", "Happy ako"], "water": ["Tubig", "Water"], "eat": ["Kain", "Kain"],
+    "home": ["Bahay", "Home"], "bathroom": ["Banyo", "CR"], "more": ["Dagdag", "More"],
+    "happy": ["Masaya", "Happy"], "sad": ["Malungkot", "Sad"], "i'm sad": ["Malungkot ako", "Sad ako"],
+    "angry": ["Galit", "Galit"], "i'm angry": ["Galit ako", "Galit ako"],
+    "scared": ["Takot", "Takot"], "i'm scared": ["Takot ako", "Takot ako"],
+    "tired": ["Pagod", "Pagod"], "i'm tired": ["Pagod na ako", "Pagod na ako"],
+    "sick": ["May sakit", "Sick"], "i feel sick": ["Masama ang pakiramdam ko", "Masama ang pakiramdam ko"],
+    "hurt": ["Masakit", "Masakit"], "i'm hurt": ["Nasaktan ako", "Nasaktan ako"],
+    "hot": ["Mainit", "Mainit"], "i'm hot": ["Naiinitan ako", "Mainit"],
+    "cold": ["Malamig", "Malamig"], "i'm cold": ["Nilalamig ako", "Nilalamig ako"],
+    "play": ["Laro", "Play"], "i want to play": ["Gusto kong maglaro", "Gusto kong mag-play"],
+    "ball": ["Bola", "Ball"], "toys": ["Laruan", "Toys"], "draw": ["Gumuhit", "Draw"], "book": ["Aklat", "Book"],
+    "music": ["Musika", "Music"], "tv": ["TV", "TV"], "outside": ["Sa labas", "Outside"],
+    "go outside": ["Lalabas ako", "Labas tayo"], "dance": ["Sayaw", "Dance"],
+    "hello": ["Kumusta", "Hello"], "goodbye": ["Paalam", "Bye"],
+    "good morning": ["Magandang umaga", "Good morning"], "good night": ["Magandang gabi", "Good night"],
+    "please": ["Pakiusap", "Please po"], "thank you": ["Salamat", "Thank you po"],
+    "sorry": ["Pasensya", "Sorry"], "i'm sorry": ["Pasensya na po", "Sorry po"],
+    "i love you": ["Mahal kita", "I love you"], "excuse me": ["Paumanhin po", "Excuse me po"],
+    "i want": ["Gusto ko", "Gusto ko"], "give me": ["Pahingi", "Give me"],
+    "my turn": ["Akin na", "Turn ko"], "your turn": ["Ikaw naman", "Turn mo"],
+    "again": ["Ulit", "Again"], "all done": ["Tapos na", "Tapos na"], "stop": ["Tigil", "Stop"], "wait": ["Sandali", "Wait"],
+    "mom": ["Nanay", "Mommy"], "dad": ["Tatay", "Daddy"], "bedroom": ["Kuwarto", "Bedroom"], "kitchen": ["Kusina", "Kitchen"],
+    "bath": ["Ligo", "Bath"], "i want a bath": ["Gusto kong maligo", "Gusto kong maligo"],
+    "snack": ["Meryenda", "Snack"], "i want a snack": ["Gusto ko ng meryenda", "Gusto ko ng snack"],
+    "pet": ["Alaga", "Pet"], "my pet": ["Ang alaga ko", "My pet"],
+    "sleep": ["Tulog", "Sleep"], "i want to sleep": ["Gusto kong matulog", "Gusto kong matulog"],
+    "teacher": ["Guro", "Teacher"], "friend": ["Kaibigan", "Friend"],
+    "i need the bathroom": ["Kailangan ko ng banyo", "Kailangan ko ng CR"],
+    "lunch": ["Tanghalian", "Lunch"], "i'm hungry for lunch": ["Gutom na ako para sa tanghalian", "Gutom na ako, lunch na"],
+    "recess": ["Recess", "Recess"], "pencil": ["Lapis", "Pencil"],
+    "finished": ["Tapos na", "Tapos na"], "i'm finished": ["Tapos na ako", "Tapos na ako"],
+    "help me": ["Tulungan mo ako", "Help me po"], "i need help": ["Kailangan ko ng tulong", "Need ko ng help"],
+    "doctor": ["Doktor", "Doctor"], "nurse": ["Nars", "Nurse"], "medicine": ["Gamot", "Medicine"],
+    "hurts here": ["Masakit dito", "Masakit dito"], "it hurts here": ["Masakit dito", "Masakit dito"],
+    "i want water": ["Gusto ko ng tubig", "Gusto ko ng water"],
+    "how long?": ["Gaano katagal?", "Gaano katagal?"], "how long do i wait?": ["Gaano katagal ako maghihintay?", "Gaano katagal pa?"],
+    "go home": ["Uwi na", "Uwi na"], "i want to go home": ["Gusto ko nang umuwi", "Gusto ko nang umuwi"],
+    "car": ["Kotse", "Car"], "bus": ["Bus", "Bus"], "store": ["Tindahan", "Store"], "park": ["Parke", "Park"],
+    "eat out": ["Kain sa labas", "Eat out"], "i want to eat out": ["Gusto kong kumain sa labas", "Gusto kong mag-eat out"],
+    "too loud": ["Masyadong maingay", "Sobrang ingay"], "it's too loud": ["Masyadong maingay", "Sobrang ingay"],
+    "too bright": ["Masyadong maliwanag", "Sobrang liwanag"], "it's too bright": ["Masyadong maliwanag", "Sobrang liwanag"],
+    "wake up": ["Gising", "Gising na"], "i'm awake": ["Gising na ako", "Gising na ako"],
+    "brush teeth": ["Magsipilyo", "Brush teeth"], "i want to brush my teeth": ["Gusto kong magsipilyo", "Gusto kong mag-brush ng teeth"],
+    "wash face": ["Maghilamos", "Wash face"], "i want to wash my face": ["Gusto kong maghilamos", "Gusto kong maghilamos"],
+    "get dressed": ["Magbihis", "Get dressed"], "i want to get dressed": ["Gusto kong magbihis", "Gusto kong magbihis"],
+    "breakfast": ["Almusal", "Breakfast"], "i want breakfast": ["Gusto ko ng almusal", "Gusto ko ng breakfast"],
+    "it's time for my medicine": ["Oras na ng gamot ko", "Time na ng medicine ko"],
+    "school": ["Paaralan", "School"], "i'm ready for school": ["Handa na ako sa paaralan", "Ready na ako sa school"],
+    "hug": ["Yakap", "Hug"], "i want a hug": ["Gusto ko ng yakap", "Gusto ko ng hug"],
+    "hungry": ["Gutom", "Hungry"], "i'm hungry": ["Gutom na ako", "Gutom na ako"],
+    "rice": ["Kanin", "Rice"], "rice, please": ["Gusto ko ng kanin", "Rice po"],
+    "meat": ["Karne", "Meat"], "meat, please": ["Gusto ko ng karne", "Meat po"],
+    "vegetables": ["Gulay", "Veggies"], "vegetables, please": ["Gusto ko ng gulay", "Gulay po"],
+    "fruit": ["Prutas", "Fruit"], "fruit, please": ["Gusto ko ng prutas", "Fruit po"],
+    "juice": ["Juice", "Juice"], "juice, please": ["Gusto ko ng juice", "Juice po"],
+    "dessert": ["Panghimagas", "Dessert"], "dessert, please": ["Gusto ko ng panghimagas", "Dessert po"],
+    "wash hands": ["Maghugas ng kamay", "Wash hands"], "i need to wash my hands": ["Maghuhugas ako ng kamay", "Maghuhugas ako ng hands"],
+    "full": ["Busog", "Full"], "i'm full": ["Busog na ako", "Busog na ako"],
+    "homework": ["Takdang-aralin", "Homework"], "i have homework": ["May takdang-aralin ako", "May homework ako"],
+    "story": ["Kuwento", "Story"], "read me a story": ["Basahan mo ako ng kuwento", "Read me a story po"],
+    "cartoons": ["Cartoons", "Cartoons"], "i want to watch cartoons": ["Gusto kong manood ng cartoons", "Gusto kong manood ng cartoons"],
+    "friends": ["Mga kaibigan", "Friends"], "i want to play with friends": ["Gusto kong makipaglaro sa kaibigan", "Gusto kong makipag-play sa friends"],
+    "rest": ["Pahinga", "Rest"], "i want to rest": ["Gusto kong magpahinga", "Gusto kong mag-rest"],
+    "phone": ["Telepono", "Phone"], "i want the phone": ["Gusto ko ang telepono", "Gusto ko ng phone"],
+    "dinner": ["Hapunan", "Dinner"], "i'm ready for dinner": ["Handa na ako sa hapunan", "Ready na ako for dinner"],
+    "soup": ["Sabaw", "Soup"], "soup, please": ["Gusto ko ng sabaw", "Soup po"],
+    "fish": ["Isda", "Fish"], "fish, please": ["Gusto ko ng isda", "Fish po"],
+    "together": ["Sabay-sabay", "Together"], "let's eat together": ["Sabay-sabay tayong kumain", "Kain tayo together"],
+    "yummy": ["Masarap", "Yummy"], "this is yummy": ["Masarap ito", "Yummy ito"],
+    "pajamas": ["Pantulog", "Pajamas"], "i want my pajamas": ["Gusto ko ang pantulog ko", "Gusto ko ang pajamas ko"],
+    "light off": ["Patayin ang ilaw", "Light off"], "turn off the light": ["Patayin mo ang ilaw", "Turn off the light po"],
+    "blanket": ["Kumot", "Blanket"], "i want my blanket": ["Gusto ko ang kumot ko", "Gusto ko ang blanket ko"]
+  };
+  var UI = {
+    home: ["Tahanan", "Home", "Home"], topics: ["Paksa", "Topics", "Topics"], type: ["I-type", "Type", "Type"],
+    history: ["Talaan", "History", "History"], hereSet: ["Lugar", "Place", "Place"], more: ["Iba pa", "More", "More"],
+    where: ["Nasaan ako?", "Where am I?", "Where am I?"],
+    tapHint: ["Pindutin ang button para magsalita…", "Tap a button to speak…", "Tap a button to speak…"],
+    typeHint: ["Mag-type ng mensahe…", "Type a message…", "Type a message…"],
+    feelings: ["Damdamin", "Feelings", "Feelings"], play: ["Laro", "Play", "Play"],
+    greetings: ["Pagbati", "Greetings", "Greetings"], exchange: ["Palitan", "Exchange", "Exchange"],
+    morning: ["Umaga", "Morning", "Morning"], lunch: ["Tanghali", "Lunch", "Lunch"], afternoon: ["Hapon", "Afternoon", "Afternoon"],
+    dinner: ["Hapunan", "Dinner", "Dinner"], bed: ["Tulog", "Bedtime", "Bedtime"], nowIs: ["Ngayon: ", "Now: ", "Now: "]
+  };
+  function lidx() { return state.s.lang === "tag" ? 1 : 0; }
+  function tr(t) {
+    if (!t || state.s.lang === "en") return t;
+    var e = TR[norm(t)]; if (!e) return t;
+    return e[lidx()] !== undefined ? e[lidx()] : e[0];
+  }
+  function ui(k) {
+    var e = UI[k]; if (!e) return k;
+    return state.s.lang === "en" ? e[2] : e[lidx()];
+  }
+  var REVC = null;
+  function rev(t) {
+    if (state.s.lang === "en") return norm(t);
+    if (!REVC) {
+      REVC = {};
+      Object.keys(TR).forEach(function (k) { TR[k].forEach(function (v) { var n = norm(v); if (!REVC[n]) REVC[n] = k; }); });
+    }
+    return REVC[norm(t)] || norm(t);
+  }
+  var FIL_COMMON = "ako ikaw siya kami tayo kayo sila ko mo niya natin namin ninyo nila ang ng sa na at o pero para dahil ito iyon dito doon oo hindi opo po ba lang din rin pa pang gusto ayaw kailangan puwede pwede salamat pakiusap tulong sandali tigil ulit tapos kain inom tulog laro tubig pagkain gutom uhaw busog pagod masaya malungkot galit takot masakit mainit malamig bahay paaralan banyo nanay tatay kapatid lola lolo guro kaibigan doktor gamot ospital labas loob ngayon mamaya bukas kahapon umaga tanghali hapon gabi kumusta paalam mahal pasensya paumanhin ano saan kailan sino bakit paano";
   var TYPES = { home: "Home", school: "School", clinic: "Clinic", other: "Out and about" };
   function getPage(id) { return PAGES[id] || PAGES.home; }
   function curPlace() {
@@ -632,11 +905,10 @@ html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
   function ctxKey() { var p = curPlace(); return p ? "ctx_" + (CTX["ctx_" + p.type] ? p.type : "other") : null; }
   var HUES = [12, 40, 85, 140, 168, 205, 245, 268, 295, 320];
 
-  /* ---------- state ---------- */
   var KEY = "midtech-aac-v1";
   var state = {
     page: "home", sentence: [], edit: false, editing: null, hue: 150,
-    s: { voiceURI: "", rate: 1, pitch: 1, volume: 1, speakTap: true, size: "1", build: true },
+    s: { voiceURI: "", rate: 1, pitch: 1, volume: 1, speakTap: true, size: "1", build: true, lang: "en" },
     custom: {}, hist: [], pin: null, locked: false, auto: true, place: null, placeAuto: false, typed: "",
     places: [
       { id: "p_home", name: "Home", type: "home", radius: 100 },
@@ -665,14 +937,12 @@ html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
   var synth = ("speechSynthesis" in window) ? window.speechSynthesis : null;
   var voices = [];
 
-  /* ---------- toast ---------- */
   var toastTimer;
   function toast(msg) {
     var t = $("toast"); t.textContent = msg; t.classList.add("on");
     clearTimeout(toastTimer); toastTimer = setTimeout(function () { t.classList.remove("on"); }, 2600);
   }
 
-  /* ---------- speech ---------- */
   function speak(text) {
     if (!text) return;
     if (!synth) { toast("This browser can't speak out loud."); return; }
@@ -680,13 +950,30 @@ html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
       synth.cancel();
       var u = new SpeechSynthesisUtterance(text);
       u.rate = +state.s.rate; u.pitch = +state.s.pitch; u.volume = +state.s.volume;
-      if (state.s.voiceURI) {
-        for (var i = 0; i < voices.length; i++) if (voices[i].voiceURI === state.s.voiceURI) { u.voice = voices[i]; u.lang = voices[i].lang; break; }
-      }
+      var vo = null, wantFil = state.s.lang !== "en";
+      if (state.s.voiceURI) for (var i = 0; i < voices.length; i++) if (voices[i].voiceURI === state.s.voiceURI) { vo = voices[i]; break; }
+      if (!vo && wantFil) vo = filVoice();
+      if (vo) { u.voice = vo; u.lang = vo.lang; } else if (wantFil) u.lang = "fil-PH";
       u.onstart = function () { $("sentence").classList.add("speaking"); };
       u.onend = u.onerror = function () { $("sentence").classList.remove("speaking"); };
       synth.speak(u);
     } catch (e) { toast("Speech did not start. Try again."); }
+  }
+  function filVoice() {
+    var best = null;
+    for (var i = 0; i < voices.length; i++) {
+      var l = (voices[i].lang || "").toLowerCase().replace("_", "-");
+      if (l === "fil-ph" || l === "tl-ph") return voices[i];
+      if (!best && (l.indexOf("fil") === 0 || l.indexOf("tl") === 0)) best = voices[i];
+    }
+    return best;
+  }
+  function updateLangHint() {
+    var h = $("langHint"); if (!h) return;
+    if (state.s.lang === "en") { h.textContent = "Buttons and speech use English."; return; }
+    if (!synth) { h.textContent = "This view can’t speak out loud."; return; }
+    h.textContent = filVoice() ? "A Filipino voice was found on this device."
+      : "No Filipino voice found on this device. An English voice will read the words, so they may sound off. Add a Filipino voice in your device’s speech settings.";
   }
   function stopSpeech() { try { if (synth) synth.cancel(); } catch (e) {} $("sentence").classList.remove("speaking"); }
 
@@ -705,18 +992,19 @@ html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
     });
     sel.value = state.s.voiceURI || "";
     if (sel.value !== (state.s.voiceURI || "")) sel.value = "";
+    updateLangHint();
   }
   if (synth) { loadVoices(); try { synth.addEventListener("voiceschanged", loadVoices); } catch (e) { synth.onvoiceschanged = loadVoices; } }
 
-  /* ---------- sentence bar ---------- */
   function renderBar() {
     var typed = state.typed, has = state.sentence.length > 0 || typed.length > 0, st = $("stext");
     var t = state.sentence.join(" ");
     if (typed) t += (t ? " " : "") + typed + "|";
-    $("stextInner").textContent = has ? t : (state.page === "type" ? "Type a message…" : "Tap a button to speak…");
+    $("stextInner").textContent = has ? t : ui(state.page === "type" ? "typeHint" : "tapHint");
     st.classList.toggle("empty", !has);
     $("btnBack").hidden = !(has && (state.s.build || typed));
     $("btnClear").hidden = !has;
+    $("btnAI").hidden = !(has && aiOK);
     st.scrollLeft = (state.s.build || typed) ? st.scrollWidth : 0;
     renderSugg();
   }
@@ -759,7 +1047,7 @@ html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
     board.appendChild(last);
   }
   function dialogOpen() {
-    return ["settingsScrim", "editScrim", "pinScrim", "placesScrim", "whereScrim"].some(function (id) { return !$(id).hidden; });
+    return ["settingsScrim", "editScrim", "pinScrim", "placesScrim", "whereScrim", "topicsScrim", "aiScrim"].some(function (id) { return !$(id).hidden; });
   }
   document.addEventListener("keydown", function (e) {
     if (state.page !== "type" || dialogOpen() || e.ctrlKey || e.metaKey || e.altKey) return;
@@ -776,7 +1064,6 @@ html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
     if (state.s.speakTap) { speak(text); if (!state.s.build) recordHist([text]); }
   }
 
-  /* ---------- word suggestions (rule based, works offline) ---------- */
   var DEFAULT_START = ["Yes", "No", "Help", "Please", "I want", "Hello"];
   var STARTERS = {
     home: ["Mom", "Dad", "I want a snack", "TV"],
@@ -842,29 +1129,35 @@ html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
   function suggestions() {
     var out = [], s0 = state.sentence, last = s0.length ? s0[s0.length - 1] : "", pl = curPlace();
     function add(list) {
-      (list || []).forEach(function (w) { if (out.length < 6 && out.indexOf(w) < 0 && norm(w) !== norm(last)) out.push(w); });
+      (list || []).forEach(function (w) { var x = tr(w); if (out.length < 6 && out.indexOf(x) < 0 && norm(x) !== norm(last)) out.push(x); });
     }
     if (!s0.length) {
       add(pl && STARTERS[pl.type]);
+      add(TIME_START[slotName()]);
       add(state.hist.slice(0, 2).map(function (e) { return e.text; }));
       add(DEFAULT_START);
     } else {
       add(learned(last));
-      add(NEXT[norm(last)] || NEXT[lastWord(last)]);
+      var ek = rev(last);
+      add(NEXT[ek] || NEXT[lastWord(ek)]);
       add(NEXT["default"]);
     }
     return out;
   }
   var COMMON = "a an the and or but to of in on at for with from by about as it its this that these those here there what where when who why how can could will would should do does did don't doesn't not is are am was were be been have has had i me my mine we us our you your he him his she her they them their yes no ok okay please thank thanks sorry hello hi bye goodbye good bad big little small more less again all some any every now later today tomorrow yesterday up down in out over under off open close stop go come wait look see hear say tell ask give take get put make eat drink sleep play read write draw sing dance walk run sit stand help hurt happy sad mad angry scared tired hungry thirsty hot cold sick mom dad friend teacher doctor nurse home school bathroom toilet water food snack juice milk rice bread breakfast lunch dinner love like want need feel think know understand turn music book toy ball game phone tv outside inside car bus store park";
-  var LEX = null;
+  var LEXC = {};
   function lexicon() {
-    if (LEX) return LEX;
+    var lg = state.s.lang;
+    if (LEXC[lg]) return LEXC[lg];
     var m = {};
     function add(t) {
       String(t).toLowerCase().replace(/’/g, "'").split(/[^a-z']+/).forEach(function (w) { if (w.length > 1 || w === "i" || w === "a") m[w] = 1; });
     }
-    Object.keys(PAGES).forEach(function (k) { PAGES[k].items.forEach(function (it) { add(it.label); add(it.say); }); });
-    add(COMMON); LEX = Object.keys(m); return LEX;
+    Object.keys(PAGES).forEach(function (k) {
+      PAGES[k].items.forEach(function (it) { add(it.label); add(it.say); if (lg !== "en") { add(tr(it.label)); add(tr(it.say)); } });
+    });
+    add(COMMON); if (lg !== "en") add(FIL_COMMON);
+    LEXC[lg] = Object.keys(m); return LEXC[lg];
   }
   function complete(prefix) {
     var freq = {}, pool = lexicon().slice();
@@ -889,7 +1182,6 @@ html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
     });
   }
 
-  /* ---------- history ---------- */
   function recordHist(words) {
     if (!words.length) return;
     var text = words.join(" "), h = state.hist, i;
@@ -923,10 +1215,10 @@ html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
     });
   }
 
-  /* ---------- board ---------- */
   function eff(pageId, item) {
     var c = state.custom[pageId + ":" + item.id], o = {};
     Object.keys(item).forEach(function (k) { o[k] = item[k]; });
+    o.label = tr(o.label); o.say = tr(o.say);
     if (c) {
       if (c.label) o.label = c.label;
       if (c.say) o.say = c.say;
@@ -939,6 +1231,7 @@ html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
 
   function renderBoard(animate) {
     if (state.page.indexOf("ctx_") === 0 && ctxKey() !== state.page) state.page = "home";
+    if (state.page.indexOf("rt_") === 0 && state.page !== slotKey()) state.page = slotKey();
     var page = getPage(state.page), board = $("board");
     board.innerHTML = "";
     board.classList.toggle("edit", state.edit);
@@ -959,40 +1252,47 @@ html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
     if (state.page === "history") renderHistory(board);
     else if (state.page === "type") renderKeyboard(board);
     else page.items.forEach(function (it) { var o = eff(state.page, it); o.pageId = state.page; addTile(o, false); });
-    if (state.page === "home") addTile({ label: "More", sym: "more", hue: 320, go: page.next }, true);
+    if (state.page === "home") addTile({ label: ui("more"), sym: "more", hue: 320, go: "topics" }, true);
     renderTabs();
     if (animate) { board.classList.remove("swap"); void board.offsetWidth; board.classList.add("swap"); }
   }
 
-  var PIN_SVG = '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a7 7 0 0 0-7 7c0 5 7 13 7 13s7-8 7-13a7 7 0 0 0-7-7zm0 9.5A2.5 2.5 0 1 1 12 6.500a2.500 2.500 0 0 1 0 5z"/></svg>';
+  var S0 = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">';
+  var ICO = {
+    home: S0 + '<path d="M3 11l9-8 9 8"/><path d="M5 10v10h5v-6h4v6h5V10"/></svg>',
+    now: S0 + '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>',
+    here: '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a7 7 0 0 0-7 7c0 5 7 13 7 13s7-8 7-13a7 7 0 0 0-7-7zm0 9.5A2.500 2.500 0 1 1 12 6.500a2.500 2.500 0 0 1 0 5z"/></svg>',
+    topics: S0 + '<rect x="3" y="3" width="7.500" height="7.500" rx="2"/><rect x="13.500" y="3" width="7.500" height="7.500" rx="2"/><rect x="3" y="13.500" width="7.500" height="7.500" rx="2"/><rect x="13.500" y="13.500" width="7.500" height="7.500" rx="2"/></svg>',
+    type: S0 + '<rect x="2.500" y="6" width="19" height="12" rx="2.500"/><path d="M6 10h.01M10 10h.01M14 10h.01M18 10h.01M7 14h10"/></svg>',
+    history: S0 + '<path d="M3 12a9 9 0 1 0 3-6.700"/><path d="M3 4v5h5"/><path d="M12 8v4l3 2"/></svg>'
+  };
+  var TOPICS = ["feelings", "play", "greetings", "exchange"];
+  var TOPIC_EMOJI = { feelings: "😊", play: "🎮", greetings: "👋", exchange: "🔄" };
+  var TOPIC_HUE = { feelings: 90, play: 268, greetings: 40, exchange: 168 };
   function renderTabs() {
     var box = $("tabs"); box.innerHTML = "";
-    var pl = curPlace();
-    var chip = document.createElement("button");
-    chip.type = "button"; chip.className = "tab place"; chip.innerHTML = PIN_SVG;
-    var sp = document.createElement("span"); sp.textContent = pl ? pl.name : "Set place"; chip.appendChild(sp);
-    chip.setAttribute("aria-label", "Place: " + (pl ? pl.name : "not set") + (state.locked ? "" : ". Tap to change"));
-    if (state.locked) chip.disabled = true; else chip.addEventListener("click", openWhere);
-    box.appendChild(chip);
-    var tabs = [["home", "Home"]];
-    if (pl) tabs.push([ctxKey(), "Here"]);
-    tabs.push(["feelings", "Feelings"], ["play", "Play"], ["greetings", "Greetings"], ["exchange", "Exchange"], ["type", "Type"], ["history", "History"]);
-    tabs.forEach(function (t) {
-      var b = document.createElement("button");
-      b.type = "button"; b.className = "tab"; b.textContent = t[1];
-      var on = state.page === t[0];
-      b.setAttribute("aria-pressed", on ? "true" : "false");
-      if (on) b.setAttribute("aria-current", "page");
-      b.addEventListener("click", function () { if (state.page !== t[0]) go(t[0]); });
+    var pl = curPlace(), onTopic = TOPICS.indexOf(state.page) >= 0;
+    function tab(icon, label, on, fn, aria, disabled, emoji) {
+      var b = document.createElement("button"); b.type = "button"; b.className = "tab";
+      if (emoji) { var em = document.createElement("span"); em.className = "em"; em.textContent = emoji; b.appendChild(em); } else b.innerHTML = icon;
+      var sp = document.createElement("span"); sp.textContent = label; b.appendChild(sp);
+      b.setAttribute("aria-pressed", on ? "true" : "false"); if (on) b.setAttribute("aria-current", "page");
+      if (aria) b.setAttribute("aria-label", aria);
+      if (disabled) b.disabled = true; else b.addEventListener("click", fn);
       box.appendChild(b);
-    });
-    var a = box.querySelector("[aria-current]");
-    if (a && a.scrollIntoView) { try { a.scrollIntoView({ block: "nearest", inline: "nearest" }); } catch (e) {} }
+    }
+    tab(ICO.home, ui("home"), state.page === "home", function () { if (state.page !== "home") go("home"); });
+    tab(ICO.now, ui(slotName()), state.page.indexOf("rt_") === 0, function () { go(slotKey()); }, ui(slotName()) + " routine");
+    if (pl) tab(ICO.here, pl.name, state.page === ctxKey(), function () { go(ctxKey()); }, "Words for " + pl.name);
+    else tab(ICO.here, ui("hereSet"), false, openWhere, "Set your place", state.locked);
+    tab(ICO.topics, ui("topics"), onTopic, openTopics, onTopic ? "Topics, now in " + ui(state.page) : "Topics", false, onTopic ? TOPIC_EMOJI[state.page] : "");
+    tab(ICO.type, ui("type"), state.page === "type", function () { go("type"); });
+    tab(ICO.history, ui("history"), state.page === "history", function () { go("history"); });
   }
 
   function onTile(o, el, nav) {
     if (state.locked) ensureFull();
-    if (nav) { go(o.go); return; }
+    if (nav) { if (o.go === "topics") openTopics(); else go(o.go); return; }
     if (state.edit) { openEditor(o); return; }
     addWord(o.say); pulse(el);
   }
@@ -1002,7 +1302,6 @@ html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
     renderBoard(true); renderBar();
   }
 
-  /* ---------- edit mode ---------- */
   function setEdit(on) {
     state.edit = on; $("editbar").hidden = !on; renderBoard(false);
   }
@@ -1048,13 +1347,14 @@ html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
     delete state.custom[state.editing]; persist(); closeScrim("editScrim"); renderBoard(false); toast("Original button restored");
   }
 
-  /* ---------- settings ---------- */
   function syncSettings() {
     $("rngRate").value = state.s.rate; $("rngPitch").value = state.s.pitch; $("rngVol").value = state.s.volume;
     $("vRate").textContent = (+state.s.rate).toFixed(1) + "x"; $("vPitch").textContent = (+state.s.pitch).toFixed(1);
     $("vVol").textContent = Math.round(state.s.volume * 100) + "%";
     $("chkSpeakTap").checked = !!state.s.speakTap;
     $("chkBuild").checked = !!state.s.build;
+    Array.prototype.forEach.call(document.getElementsByName("lang"), function (r) { r.checked = r.value === state.s.lang; });
+    updateLangHint();
     Array.prototype.forEach.call(document.getElementsByName("size"), function (r) { r.checked = r.value === String(state.s.size); });
     $("selVoice").value = state.s.voiceURI || "";
     if (!synth) { $("selVoice").disabled = true; }
@@ -1104,7 +1404,7 @@ html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
     $("edSave").addEventListener("click", saveEditor);
     $("edReset").addEventListener("click", resetTile);
     $("edClose").addEventListener("click", function () { closeScrim("editScrim"); });
-    ["settingsScrim", "editScrim", "placesScrim", "whereScrim"].forEach(function (id) {
+    ["settingsScrim", "editScrim", "placesScrim", "whereScrim", "topicsScrim", "aiScrim"].forEach(function (id) {
       $(id).addEventListener("click", function (e) { if (e.target === $(id)) closeScrim(id); });
     });
     ["edLabel", "edSay", "edSym"].forEach(function (id) {
@@ -1113,6 +1413,8 @@ html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
     document.addEventListener("keydown", function (e) {
       if (e.key !== "Escape") return;
       if (!$("pinScrim").hidden) closePin();
+      else if (!$("aiScrim").hidden) closeAI();
+      else if (!$("topicsScrim").hidden) closeScrim("topicsScrim");
       else if (!$("editScrim").hidden) closeScrim("editScrim");
       else if (!$("whereScrim").hidden) closeScrim("whereScrim");
       else if (!$("placesScrim").hidden) closeScrim("placesScrim");
@@ -1120,7 +1422,6 @@ html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
     });
   }
 
-  /* ---------- places and location ---------- */
   function mk(label, fn) {
     var b = document.createElement("button"); b.type = "button"; b.className = "btn"; b.textContent = label;
     b.addEventListener("click", fn); return b;
@@ -1236,7 +1537,6 @@ html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
     });
   }
 
-  /* ---------- caregiver PIN lock ---------- */
   var GEAR_HTML = "";
   var LOCK_HTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9" rx="2.5" fill="currentColor"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>';
   function ensureFull() {
@@ -1397,7 +1697,127 @@ html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
     });
   }
 
-  /* ---------- fullscreen + wake lock ---------- */
+  function openTopics() {
+    var box = $("topicGrid"); box.innerHTML = "";
+    $("tpTitle").textContent = ui("topics");
+    TOPICS.forEach(function (k) {
+      var b = document.createElement("button"); b.type = "button"; b.className = "tcard"; b.style.setProperty("--h", TOPIC_HUE[k]);
+      var em = document.createElement("span"); em.className = "em"; em.textContent = TOPIC_EMOJI[k];
+      var lb = document.createElement("span"); lb.textContent = ui(k);
+      b.appendChild(em); b.appendChild(lb); b.setAttribute("aria-pressed", state.page === k ? "true" : "false");
+      b.addEventListener("click", function () { closeScrim("topicsScrim"); go(k); });
+      box.appendChild(b);
+    });
+    var pl = curPlace(), w = $("topicsWhere");
+    w.textContent = "📍 " + ui("where") + (pl ? "  ·  " + pl.name : "");
+    w.disabled = state.locked;
+    openScrim("topicsScrim", "topicsClose");
+  }
+
+  /* ---------- language ---------- */
+  var LANG_SHORT = { en: "EN", fil: "FIL", tag: "TAG" }, LANG_FULL = { en: "English", fil: "Filipino", tag: "Taglish" };
+  function setLangUI() {
+    $("btnLang").textContent = LANG_SHORT[state.s.lang] || "EN";
+    $("btnLang").setAttribute("aria-label", "Language: " + (LANG_FULL[state.s.lang] || "English") + ". Tap to change");
+    document.documentElement.lang = state.s.lang === "en" ? "en" : "fil";
+  }
+  function setLang(l) {
+    state.s.lang = l; persist(); setLangUI();
+    Array.prototype.forEach.call(document.getElementsByName("lang"), function (r) { r.checked = r.value === l; });
+    updateLangHint(); renderBoard(false); renderBar();
+    toast(LANG_FULL[l]);
+  }
+  function bindLang() {
+    $("btnLang").addEventListener("click", function () { setLang(state.s.lang === "en" ? "fil" : state.s.lang === "fil" ? "tag" : "en"); });
+    Array.prototype.forEach.call(document.getElementsByName("lang"), function (r) {
+      r.addEventListener("change", function () { if (r.checked) setLang(r.value); });
+    });
+    $("topicsClose").addEventListener("click", function () { closeScrim("topicsScrim"); });
+    $("topicsWhere").addEventListener("click", function () { closeScrim("topicsScrim"); openWhere(); });
+  }
+
+  var lastSlot = slotNow();
+  function checkClock() {
+    var n = slotNow(); if (n === lastSlot) return;
+    lastSlot = n;
+    if (state.page.indexOf("rt_") === 0) state.page = SLOTS[n][0];
+    renderBoard(false); renderBar();
+    toast(ui("nowIs") + ui(SLOTS[n][1]));
+  }
+  function startClock() {
+    setInterval(checkClock, 30000);
+    document.addEventListener("visibilitychange", function () { if (document.visibilityState === "visible") checkClock(); });
+  }
+
+  var aiOK = false, aiSample = null, aiTok = 0, aiCtl = null;
+  var LANG_AI = { en: "English", fil: "Filipino (Tagalog)", tag: "Taglish, the natural Filipino and English mix people speak" };
+  function probeAI() {
+    try {
+      if (!window.claude || !window.claude.use) return;
+      window.claude.use("sample").then(function (smp) {
+        if (smp && typeof smp.json === "function") { aiSample = smp; aiOK = true; renderBar(); }
+      }, function () {});
+    } catch (e) {}
+  }
+  function aiPrompt(words) {
+    var pl = curPlace(), ctx = [];
+    if (pl) ctx.push("place: " + pl.name + " (" + TYPES[pl.type] + ")");
+    ctx.push("time of day: " + slotName());
+    return "A person who communicates with an AAC board tapped these words in order: " + JSON.stringify(words) + ".\n" +
+      "Context: " + ctx.join("; ") + ".\n" +
+      "Write 3 different short first-person sentences they most likely want to say, in " + LANG_AI[state.s.lang] + ". " +
+      "Use simple everyday words, at most 12 words each, most likely meaning first. Only use what the words imply and do not invent facts. " +
+      'Reply with only JSON like {"options":["...","...","..."]}.';
+  }
+  function abortAI() { if (aiCtl) { try { aiCtl.abort(); } catch (e) {} aiCtl = null; } }
+  function closeAI() { aiTok++; abortAI(); closeScrim("aiScrim"); }
+  function aiFail(code) {
+    $("aiLoad").hidden = true;
+    var m = "Couldn’t write options right now. Your words are still here.", off = false;
+    if (code === "not_granted" || code === "sampling_disabled" || code === "not_declared" || code === "capability_disabled" || code === "capability_removed") {
+      m = "AI help isn’t allowed here, so it’s turned off. The word suggestions still work."; off = true; aiOK = false; renderBar();
+    } else if (code === "rate_limited") m = "Too many requests. Wait a minute, then tap Try again.";
+    else if (code === "session_expired") m = "Sign in to Claude again to use this.";
+    $("aiErr").textContent = m; $("aiErr").hidden = false; $("aiRetry").hidden = off;
+  }
+  function runAI(retry) {
+    var words = state.sentence.slice(); if (!words.length || !aiSample) return;
+    var tok = ++aiTok; abortAI(); aiCtl = new AbortController();
+    $("aiWords").textContent = "Your words: " + words.join(" ");
+    $("aiOpts").innerHTML = ""; $("aiErr").hidden = true; $("aiRetry").hidden = true;
+    $("aiLoad").hidden = false;
+    var opt = { modelTier: "quick", signal: aiCtl.signal }; if (retry) opt.cache = false;
+    aiSample.json(aiPrompt(words), opt).then(function (res) {
+      if (tok !== aiTok || $("aiScrim").hidden) return;
+      var list = res && Array.isArray(res.options) ? res.options : (Array.isArray(res) ? res : []);
+      list = list.map(function (x) { return String(x).trim(); }).filter(function (x) { return x && x.length <= 140; }).slice(0, 3);
+      $("aiLoad").hidden = true;
+      if (!list.length) { aiFail("empty"); return; }
+      list.forEach(function (t) {
+        var b = document.createElement("button"); b.type = "button"; b.className = "aiopt"; b.textContent = t;
+        b.addEventListener("click", function () { aiPick(t); });
+        $("aiOpts").appendChild(b);
+      });
+      $("aiRetry").hidden = false;
+      var f = $("aiOpts").firstChild; if (f && f.focus) f.focus();
+    }, function (e) {
+      if (tok !== aiTok || $("aiScrim").hidden) return;
+      aiFail(e && e.code);
+    });
+  }
+  function aiPick(t) { closeAI(); state.sentence = [t]; state.typed = ""; renderBar(); speak(t); recordHist([t]); }
+  function openAI() {
+    commitTyped(); renderBar();
+    if (!state.sentence.length || !aiSample) return;
+    openScrim("aiScrim", "aiClose"); runAI(false);
+  }
+  function bindAI() {
+    $("btnAI").addEventListener("click", openAI);
+    $("aiClose").addEventListener("click", closeAI);
+    $("aiOwn").addEventListener("click", function () { closeAI(); speakSentence(); });
+    $("aiRetry").addEventListener("click", function () { runAI(true); });
+  }
+
   var FULL_OUT = "M4 9V4h5M15 4h5v5M20 15v5h-5M9 20H4v-5", FULL_IN = "M9 4v5H4M15 4v5h5M20 15h-5v5M4 15h5v5";
   function bindFull() {
     var btn = $("btnFull");
@@ -1423,13 +1843,12 @@ html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
   document.addEventListener("visibilitychange", keepAwake);
   document.addEventListener("pointerdown", keepAwake, { once: true });
 
-  /* ---------- wire up ---------- */
   $("btnSpeak").addEventListener("click", speakSentence);
   $("stext").addEventListener("click", speakSentence);
   $("btnBack").addEventListener("click", function () { typeBack(); stopSpeech(); });
   $("btnClear").addEventListener("click", function () { state.sentence = []; state.typed = ""; renderBar(); stopSpeech(); });
-  bindSettings(); bindFull(); bindCare();
-  syncSettings(); renderBar(); renderBoard(false); applyLock();
+  bindSettings(); bindFull(); bindCare(); bindLang(); bindAI();
+  syncSettings(); setLangUI(); renderBar(); renderBoard(false); applyLock(); probeAI(); startClock();
   refreshWatch();
 })();
 </script>
